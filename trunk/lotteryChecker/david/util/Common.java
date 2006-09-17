@@ -155,25 +155,6 @@ public String getPage(java.net.URL url)
 	return html.toString();
 	}
 
- /**
- * Tests a String to see if it can be converted to a floating point number.
- * @param possibleNumber String representation of a number, or not.
- * @return boolean
- */
-public final static boolean isADecimalNumber(String possibleDecimalNumber)
-	{
-	boolean isNumeric=false;
-	try 
-		{
-		Float.valueOf(possibleDecimalNumber);  //Test for numeric
-		isNumeric=true;
-		}
-	catch(NumberFormatException e)
-		{
-		// Must not be a number
-		}
-	return isNumeric;
-	}
 /**
  * Tests a String to see if it can be converted to an int.
  * @param possibleNumber String representation of a number, or not.
@@ -193,13 +174,6 @@ public final static boolean isANumber(String possibleNumber)
 		}
 	return isNumeric;
 	}
-/**
- * Determines if this is a file extension for an HTML document. Only
- * valid in the BFS Marketing Program context.
- * 
- * @return boolean
- * @param fileExtension java.lang.String
- */
 /**
  * Reformats a string representation of a date into the normalized form <i>mm/dd/yyyy</i>.
  * @param dateString String representation of a date.
@@ -321,10 +295,10 @@ public final String normalizeDateString(String dateString, String separator)
  * @return java.util.Enumeration
  */
 public final static Enumeration extract(String original,
-																				String leftDelimiter,
-																				boolean includeLeftDelimiter,
-																				String rightDelimiter,
-																				boolean includeRightDelimiter) 
+										String leftDelimiter,
+										boolean includeLeftDelimiter,
+										String rightDelimiter,
+										boolean includeRightDelimiter) 
 	{
 	Vector v=new Vector();
 	if (original!=null && leftDelimiter!=null && rightDelimiter!=null)
@@ -476,18 +450,6 @@ public final static String padString(char pad, int length, String text, boolean 
 	return temp.toString().substring(padOnRight?0:text.length(),padOnRight?length:length+text.length());
 	}
 /**
- * Takes an Integer, purifies it, and returns it.
- * Returned Integer is guaranteed to contain a valid number.
- * @return java.lang.Integer
- * @param text java.lang.Integer
- */
-public final static Integer sanctify(Integer integerObject) 
-	{
-	if (integerObject==null) 
-		integerObject=new Integer(0);
-	return integerObject;
-	}
-/**
  * Takes a string, trims it, and returns it.
  * Returned string is guaranteed to not be null or have any whitespace on either end.
  * @return java.lang.String 
@@ -534,19 +496,6 @@ public final String sanctify(String text, boolean removeInternalWhitespace)
 	return text;
 	}
 
- /**
- * Takes a java.sql.Date, purifies it, and returns it.
- * Returned Date is guaranteed to contain a valid date.
- * @return java.sql.Date
- * @param dateObject java.sql.Date
- */
-public final static java.sql.Date sanctify(java.sql.Date dateObject) 
-	{
-	if (dateObject==null) 
-		dateObject=new java.sql.Date(new java.util.Date().getTime());
-
-	return dateObject;
-	}
 /**
  * Replaces all occurrances of a string <b>key</b> 
  *  within another string <b>original</b> with a third string <b>text</b>.
