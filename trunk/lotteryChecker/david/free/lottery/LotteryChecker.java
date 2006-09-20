@@ -10,12 +10,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
-import java.awt.Dialog;
-import java.awt.Frame;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
-import javax.swing.JLabel;
 
 public class LotteryChecker extends JFrame implements LotteryListener
 	{
