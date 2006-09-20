@@ -10,10 +10,17 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import java.awt.Dialog;
+import java.awt.Frame;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import javax.swing.JLabel;
 
 public class LotteryChecker extends JFrame implements LotteryListener
 	{
 
+	protected static final String	aboutText	="<html><center><h3>Powerball Lottery Checker</h3><small>by </small><b>David E. Powell</b></center></html>";
 	private JPanel		jContentPane	=null;
 	private JMenuBar	jJMenuBar		=null;
 	private JMenu		fileMenu		=null;
@@ -32,7 +39,9 @@ public class LotteryChecker extends JFrame implements LotteryListener
 	private JMenuItem duplicateJMenuItem = null;
 	private int lastRowClicked=0;
 	private JMenuItem removeJMenuItem = null;
-	
+	private JDialog aboutJDialog = null;  //  @jve:decl-index=0:visual-constraint="581,166"
+	private JPanel aboutJContentPane = null;
+	private JLabel aboutJLabel = null;
 	public LotteryChecker() throws HeadlessException
 		{
 		super();
@@ -215,7 +224,10 @@ public class LotteryChecker extends JFrame implements LotteryListener
 				{
 					public void actionPerformed(ActionEvent e)
 						{
-						new JDialog(LotteryChecker.this, "About", true).show();
+						Component source=((Component)e.getSource()).getParent();
+						JDialog about=getAboutJDialog();
+						about.setLocation(source.getX(), source.getY());
+						about.show();
 						}
 				});
 			}
@@ -282,6 +294,14 @@ public class LotteryChecker extends JFrame implements LotteryListener
 			saveMenuItem=new JMenuItem();
 			saveMenuItem.setText("Save");
 			saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.CTRL_MASK, true));
+			saveMenuItem.addActionListener(new ActionListener()
+				{
+				public void actionPerformed(ActionEvent e)
+					{
+					((AbstractNumberTableModel)getNumberListJTable().getModel()).persistRows();
+					setMessage("Lottery numbers saved.");
+					}
+				});
 			}
 		return saveMenuItem;
 		}
@@ -574,6 +594,41 @@ public class LotteryChecker extends JFrame implements LotteryListener
 		model.setValueQuietlyAt("", row, 1);
 		model.setValueQuietlyAt("", row, 2);
 		model.setValueQuietlyAt("", row, 3);
+		}
+
+	/**
+	 * This method initializes aboutJDialog	
+	 * 	
+	 * @return javax.swing.JDialog	
+	 */
+	private JDialog getAboutJDialog()
+		{
+		if (aboutJDialog==null)
+			{
+			aboutJDialog=new JDialog(LotteryChecker.this, "About", true);
+			aboutJDialog.setSize(new java.awt.Dimension(250,200));
+			aboutJDialog.setContentPane(getAboutJContentPane());
+			}
+		return aboutJDialog;
+		}
+
+	/**
+	 * This method initializes aboutJContentPane	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getAboutJContentPane()
+		{
+		if (aboutJContentPane==null)
+			{
+			aboutJLabel = new JLabel();
+			aboutJLabel.setText(aboutText);
+			aboutJLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+			aboutJContentPane=new JPanel();
+			aboutJContentPane.setLayout(new BorderLayout());
+			aboutJContentPane.add(aboutJLabel, java.awt.BorderLayout.CENTER);
+			}
+		return aboutJContentPane;
 		}
 
 	/**
