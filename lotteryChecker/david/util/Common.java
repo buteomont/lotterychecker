@@ -160,7 +160,7 @@ public String getPage(java.net.URL url)
  * @param possibleNumber String representation of a number, or not.
  * @return boolean
  */
-public final static boolean isANumber(String possibleNumber)
+public final boolean isANumber(String possibleNumber)
 	{
 	boolean isNumeric=false;
 	try 
