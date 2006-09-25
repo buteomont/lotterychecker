@@ -699,8 +699,8 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 
 	public void updateNews(String news)
 		{
-		// TODO Auto-generated method stub
-		
+		// Need to make a marquee
+		infoJLabel.setText(news);
 		}
 
 	}  //  @jve:decl-index=0:visual-constraint="10,10"
