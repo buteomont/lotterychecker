@@ -10,8 +10,11 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import java.awt.BorderLayout;
 
-public class LotteryChecker extends JFrame implements LotteryListener
+public class LotteryChecker extends JFrame implements LotteryListener, JackpotListener
 	{
 
 	protected static final String	aboutText	="<html><center><h3>Powerball Lottery Checker</h3><small>by </small><b>David E. Powell</b></center></html>";
@@ -36,6 +39,11 @@ public class LotteryChecker extends JFrame implements LotteryListener
 	private JDialog aboutJDialog = null;  //  @jve:decl-index=0:visual-constraint="581,166"
 	private JPanel aboutJContentPane = null;
 	private JLabel aboutJLabel = null;
+	private JPanel infoJPanel = null;
+	private JLabel infoJLabel = null;
+	private JPanel jackpotJPanel = null;
+	private JLabel jackpotAmountJLabel = null;
+	private JLabel jLabel1 = null;
 	public LotteryChecker() throws HeadlessException
 		{
 		super();
@@ -85,7 +93,7 @@ public class LotteryChecker extends JFrame implements LotteryListener
 				{
 				public void windowClosing(WindowEvent e)
 					{
-					((AbstractNumberTableModel)getNumberListJTable().getModel()).persistRows();
+					save();
 					super.windowClosing(e);
 					}
 			});
@@ -108,6 +116,7 @@ public class LotteryChecker extends JFrame implements LotteryListener
 			jContentPane.setLayout(new BorderLayout());
 			jContentPane.add(messageJLabel, java.awt.BorderLayout.SOUTH);
 			jContentPane.add(getNumberListJScrollPane(), java.awt.BorderLayout.CENTER);
+			jContentPane.add(getInfoJPanel(), java.awt.BorderLayout.NORTH);
 			}
 		return jContentPane;
 		}
@@ -195,7 +204,7 @@ public class LotteryChecker extends JFrame implements LotteryListener
 				{
 					public void actionPerformed(ActionEvent e)
 						{
-						((AbstractNumberTableModel)getNumberListJTable().getModel()).persistRows();
+						save();
 						System.exit(0);
 						}
 				});
@@ -292,12 +301,17 @@ public class LotteryChecker extends JFrame implements LotteryListener
 				{
 				public void actionPerformed(ActionEvent e)
 					{
-					((AbstractNumberTableModel)getNumberListJTable().getModel()).persistRows();
-					setMessage("Lottery numbers saved.");
+					save();
 					}
 				});
 			}
 		return saveMenuItem;
+		}
+
+	protected void save()
+		{
+		((AbstractNumberTableModel)getNumberListJTable().getModel()).persistRows();
+		setMessage("Lottery numbers saved.");
 		}
 
 	/**
@@ -626,12 +640,67 @@ public class LotteryChecker extends JFrame implements LotteryListener
 		}
 
 	/**
+	 * This method initializes infoJPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getInfoJPanel()
+		{
+		if (infoJPanel==null)
+			{
+			infoJLabel = new JLabel();
+			infoJLabel.setText("News and Information");
+			infoJLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+			infoJLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+			infoJPanel=new JPanel();
+			infoJPanel.setLayout(new BorderLayout());
+			infoJPanel.add(infoJLabel, java.awt.BorderLayout.CENTER);
+			infoJPanel.add(getJackpotJPanel(), java.awt.BorderLayout.EAST);
+			}
+		return infoJPanel;
+		}
+
+	/**
+	 * This method initializes jackpotJPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getJackpotJPanel()
+		{
+		if (jackpotJPanel==null)
+			{
+			jLabel1 = new JLabel();
+			jLabel1.setText("Next Jackpot:");
+			jackpotAmountJLabel = new JLabel();
+			jackpotAmountJLabel.setText("(loading)");
+			jackpotAmountJLabel.setForeground(java.awt.Color.blue);
+			jackpotAmountJLabel.setFont(new java.awt.Font("MS Sans Serif", java.awt.Font.BOLD, 11));
+			jackpotJPanel=new JPanel();
+			jackpotJPanel.add(jLabel1, null);
+			jackpotJPanel.add(jackpotAmountJLabel, null);
+			PowerBalls.addListener(this);
+			}
+		return jackpotJPanel;
+		}
+
+	/**
 	 * Launches this application
 	 */
 	public static void main(String[] args)
 		{
 		LotteryChecker application=new LotteryChecker();
 		application.show();
+		}
+
+	public void updateJackpotAmount(int jackpotAmount)
+		{
+		jackpotAmountJLabel.setText("$"+jackpotAmount+" Million");
+		}
+
+	public void updateNews(String news)
+		{
+		// TODO Auto-generated method stub
+		
 		}
 
 	}  //  @jve:decl-index=0:visual-constraint="10,10"

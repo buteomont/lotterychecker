@@ -14,9 +14,15 @@ import david.util.Common;
 public class PowerBalls
 	{
 	public static final String PB_URL="http://www.powerball.com/powerball/winnums-text.txt";
+	public static final String PB_MAIN_PAGE_URL="http://www.powerball.com/";
+	public static String jackpotAmountStart="<strong>&nbsp;&nbsp;$";
+	public static String jackpotAmountEnd="Million</strong>";
+	
 	private Map drawings=new HashMap();
 	protected static PowerBalls instance;
 	private static Calendar fetched;
+	private static int jackpotAmount;
+	private static List jackpotListeners=new Vector();
 	
 	class Draw
 	{
@@ -62,7 +68,8 @@ public class PowerBalls
 		System.out.println("Fetching powerball numbers");
 		instance=new PowerBalls();
 		fetched=Calendar.getInstance();
-		String page=Common.getInstance().getPage(PB_URL); //get the numbers in plain text
+		Common handy=Common.getInstance();
+		String page=handy.getPage(PB_URL); //get the numbers in plain text
 		if (page==null || page.length()==0) throw new Exception("Unable to fetch powerball numbers.");
 		for (StringTokenizer tok=new StringTokenizer(page,"\n");tok.hasMoreTokens();)
 			{
@@ -82,7 +89,29 @@ public class PowerBalls
 			Arrays.sort(draw.whiteNumbers);
 			instance.getDrawings().put(draw.drawDate, draw);
 			}
+		
+		//update the news and jackpot amount, and notify the jackpotListeners
+		page=handy.getPage(PB_MAIN_PAGE_URL); //get the main lottery page
+		if (page==null || page.length()==0) throw new Exception("Unable to fetch powerball jackpot amount.");
+		int start=page.indexOf(jackpotAmountStart)+jackpotAmountStart.length();
+		int end=page.indexOf(jackpotAmountEnd, start);
+		String jackpot=page.substring(start,end).trim();
+		if (handy.isANumber(jackpot))
+			jackpotAmount=Integer.parseInt(jackpot);
+		else 
+			throw new Exception("Unable to find powerball jackpot amount.");
+		notifyJackpotListeners();
 		}
+	
+	private static void notifyJackpotListeners()
+		{
+		for (Iterator listeners=getJackpotListeners().iterator();listeners.hasNext();)
+			{
+			JackpotListener listener=(JackpotListener)listeners.next();
+			listener.updateJackpotAmount(jackpotAmount);
+			}
+		}
+	
 	public Map getDrawings()
 		{
 		return drawings;
@@ -90,5 +119,23 @@ public class PowerBalls
 	public void setDrawings(Map drawings)
 		{
 		this.drawings=drawings;
+		}
+	public int getJackpotAmount()
+		{
+		return jackpotAmount;
+		}
+	protected static void setJackpotAmount(int jackpotAmount)
+		{
+		PowerBalls.jackpotAmount=jackpotAmount;
+		}
+	public static List getJackpotListeners()
+		{
+		return jackpotListeners;
+		}
+	public static void addListener(JackpotListener listener)
+		{
+		PowerBalls.jackpotListeners.add(listener);
+		if (jackpotAmount>0)
+			notifyJackpotListeners(); //no need to wait for next load
 		}
 	}
