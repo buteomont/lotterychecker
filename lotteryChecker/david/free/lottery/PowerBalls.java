@@ -110,6 +110,7 @@ public class PowerBalls
 		start=page.lastIndexOf(newsStart)+newsStart.length();
 		end=page.indexOf(newsEnd, start);
 		news=page.substring(start,end).trim();
+		news=handy.substitute(news, "\\", "");
 		if (news==null || news.length()==0)
 			throw new Exception("Unable to find powerball news.");
 
