@@ -2,7 +2,7 @@ package david.free.lottery;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
@@ -44,6 +44,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	private JPanel jackpotJPanel = null;
 	private JLabel jackpotAmountJLabel = null;
 	private JLabel jLabel1 = null;
+	private JPanel spacerJPanel = null;
 	public LotteryChecker() throws HeadlessException
 		{
 		super();
@@ -78,9 +79,12 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		try
 			{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			PowerBalls.getInstance(); //initialize the news and jackpot
 			}
 		catch (Exception e)
 			{
+			e.printStackTrace();
+			messageJLabel.setText(e.getMessage());
 			}
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setJMenuBar(getJJMenuBar());
@@ -656,6 +660,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			infoJPanel.setLayout(new BorderLayout());
 			infoJPanel.add(infoJLabel, java.awt.BorderLayout.CENTER);
 			infoJPanel.add(getJackpotJPanel(), java.awt.BorderLayout.EAST);
+			infoJPanel.add(getSpacerJPanel(), java.awt.BorderLayout.WEST);
 			}
 		return infoJPanel;
 		}
@@ -684,6 +689,20 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		}
 
 	/**
+	 * This method initializes spacerJPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getSpacerJPanel()
+		{
+		if (spacerJPanel==null)
+			{
+			spacerJPanel=new JPanel();
+			}
+		return spacerJPanel;
+		}
+
+	/**
 	 * Launches this application
 	 */
 	public static void main(String[] args)
@@ -699,8 +718,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 
 	public void updateNews(String news)
 		{
-		// Need to make a marquee
-		infoJLabel.setText(news);
+		infoJLabel.setText("<html><b>"+news+"</b></html>");
 		}
 
 	}  //  @jve:decl-index=0:visual-constraint="10,10"
