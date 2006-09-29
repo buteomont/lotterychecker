@@ -121,6 +121,13 @@ public class Number extends Thread implements Serializable
 						sleep(60000);
 						continue;  //wait a minute and try again
 						}
+					//have the numbers now
+					String drawnNums="";
+					if (draw!=null)
+						drawnNums="["+buildDrawnNumberString()
+									+" ("+draw.powerballNumber
+									+") ] ";
+
 					if (winner>0)
 						{
 						String winAmount=null;
@@ -129,10 +136,10 @@ public class Number extends Thread implements Serializable
 							{
 							winAmount="$"+NumberFormat.getInstance().format(winner);
 							}
-						notifyListeners("Possible "+winAmount+" Winner!","");
+						notifyListeners("<html>"+"<b>Possible "+winAmount+" Winner! </b>"+drawnNums+"</html>","");
 						playSound(winAmount);
 						}
-					else notifyListeners("Sorry, try again.","");
+					else notifyListeners("<html>"+"Sorry, you lose. "+drawnNums+"</html>","");
 					}
 				catch (Exception e)
 					{
@@ -213,19 +220,23 @@ public class Number extends Thread implements Serializable
 	private int checkForWinner() throws Exception
 		{
 		//check the numbers
+		int results=-1;
 		notifyListeners("Checking...","");
 		draw=(PowerBalls.Draw)PowerBalls.getInstance().getDrawings().get(getDrawingDateString());
-		if (draw==null) return -1;
-		String drawnNums=buildDrawnNumberString();
-		String drawnPB=draw.powerballNumber;
-		if (checkGrandPrize(drawnNums,drawnPB)) return 1000000; //grand prize
-		else if (check200KPrize(drawnNums)) return 200000; 
-		else if (check10KPrize(drawnNums,drawnPB)) return 10000; 
-		else if (check100Prize(drawnNums,drawnPB)) return 100; 
-		else if (check7Prize(drawnNums,drawnPB)) return 7; 
-		else if (check4Prize(drawnNums,drawnPB)) return 4; 
-		else if (check3Prize(drawnPB)) return 3; 
-		else return 0;
+		if (draw!=null)
+			{
+			String drawnNums=buildDrawnNumberString();
+			String drawnPB=draw.powerballNumber;
+			if (checkGrandPrize(drawnNums,drawnPB)) results= 1000000; //grand prize
+			else if (check200KPrize(drawnNums)) results= 200000; 
+			else if (check10KPrize(drawnNums,drawnPB)) results= 10000; 
+			else if (check100Prize(drawnNums,drawnPB)) results= 100; 
+			else if (check7Prize(drawnNums,drawnPB)) results= 7; 
+			else if (check4Prize(drawnNums,drawnPB)) results= 4; 
+			else if (check3Prize(drawnPB)) results= 3;
+			else results=0;
+			}
+		return results;
 		}
 	private String buildDrawnNumberString()
 		{
