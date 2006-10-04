@@ -8,11 +8,11 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumnModel;
+import javax.swing.table.*;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import java.awt.BorderLayout;
+import javax.swing.JMenuItem;
 
 public class LotteryChecker extends JFrame implements LotteryListener, JackpotListener
 	{
@@ -32,7 +32,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	private JScrollPane numberListJScrollPane = null;
 	private NumberTable numberListJTable = null;
 	private JLabel messageJLabel = null;
-	private JPopupMenu optionJPopupMenu = null;  //  @jve:decl-index=0:visual-constraint="558,103"
+	private JPopupMenu optionJPopupMenu = null;  //  @jve:decl-index=0:visual-constraint="698,36"
 	private JMenuItem duplicateJMenuItem = null;
 	private int lastRowClicked=0;
 	private JMenuItem removeJMenuItem = null;
@@ -45,6 +45,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	private JLabel jackpotAmountJLabel = null;
 	private JLabel jLabel1 = null;
 	private JPanel spacerJPanel = null;
+	private JMenuItem refreshMenuItem = null;
 	public LotteryChecker() throws HeadlessException
 		{
 		super();
@@ -88,7 +89,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			}
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setJMenuBar(getJJMenuBar());
-		this.setSize(515, 234);
+		this.setSize(682, 234);
 		this.setLocation(600, 400);
 		this.setContentPane(getJContentPane());
 		this.setTitle("Powerball Checker");
@@ -154,6 +155,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			fileMenu=new JMenu();
 			fileMenu.setText("File");
 			fileMenu.add(getSaveMenuItem());
+			fileMenu.add(getRefreshMenuItem());
 			fileMenu.add(getExitMenuItem());
 			}
 		return fileMenu;
@@ -544,6 +546,8 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 									 getNewNumberStatusListener(mod.rows.size()));
 			mod.rows.add(newnum);
 			getOptionJPopupMenu().setVisible(false);
+			if (mod.rows.size()>=10)
+				addEmptyRow();
 			synchronizeRows(mod);
 			}
 		catch (Exception e)
@@ -700,6 +704,44 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			spacerJPanel=new JPanel();
 			}
 		return spacerJPanel;
+		}
+	private void addEmptyRow()
+		{
+		DefaultTableModel mod=(DefaultTableModel)getNumberListJTable().getModel();
+		mod.addRow((Vector) null);
+		}
+
+	/**
+	 * This method initializes refreshMenuItem	
+	 * 	
+	 * @return javax.swing.JMenuItem	
+	 */
+	private JMenuItem getRefreshMenuItem()
+		{
+		if (refreshMenuItem==null)
+			{
+			refreshMenuItem=new JMenuItem();
+			refreshMenuItem.setText("Refresh");
+			refreshMenuItem.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+							{
+							refresh();
+							}
+					});
+			}
+		return refreshMenuItem;
+		}
+
+	protected void refresh()
+		{
+		AbstractNumberTableModel mod=(AbstractNumberTableModel)getNumberListJTable().getModel();
+		for (Iterator nums=mod.getRows().iterator();nums.hasNext();)
+			{
+			Number num=(Number)nums.next();
+			if (num.isAlive()) num.interrupt();
+			num.start();
+			}
 		}
 
 	/**
