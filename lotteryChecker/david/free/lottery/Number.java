@@ -124,9 +124,9 @@ public class Number extends Thread implements Serializable
 					//have the numbers now
 					String drawnNums="";
 					if (draw!=null)
-						drawnNums="["+buildDrawnNumberString()
+						drawnNums=buildDrawnNumberString()
 									+" ("+draw.powerballNumber
-									+") ] ";
+									+")";
 
 					if (winner>0)
 						{
@@ -136,10 +136,10 @@ public class Number extends Thread implements Serializable
 							{
 							winAmount="$"+NumberFormat.getInstance().format(winner);
 							}
-						notifyListeners("<html>"+"<b>Possible "+winAmount+" Winner! </b>"+drawnNums+"</html>","");
+						notifyListeners("<html>"+"<b>Possible "+winAmount+" Winner!</b> Drawn numbers: "+drawnNums+"</html>","");
 						playSound(winAmount);
 						}
-					else notifyListeners("<html>"+"Sorry, you lose. "+drawnNums+"</html>","");
+					else notifyListeners("<html>"+"Sorry, you should have picked these numbers: "+drawnNums+"</html>","");
 					}
 				catch (Exception e)
 					{
@@ -376,6 +376,7 @@ public class Number extends Thread implements Serializable
 		Date start=Common.getInstance().getDateObject(dateAsString);
 		Calendar cal=new GregorianCalendar();
 		cal.setTime(start);
+		cal.set(Calendar.HOUR_OF_DAY, 22);
 		while (true)
 			{
 			cal.add(Calendar.DATE, 1);

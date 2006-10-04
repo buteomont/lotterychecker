@@ -4,16 +4,16 @@ import java.io.*;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 
-public abstract class AbstractNumberTableModel extends AbstractTableModel
+public abstract class AbstractNumberTableModel extends DefaultTableModel
 	{
 	public final static String filename="lottery.ser";
-	List	rows	=new Vector();
+	List	rows	=new Vector(); //this gets serialized to disk when saving
 
-	public AbstractNumberTableModel()
+	public AbstractNumberTableModel(Object[][] data, Object[] columnNames)
 		{
-		super();
+		super(data, columnNames);
 		hydrateRows();
 		}
 
@@ -75,5 +75,13 @@ public abstract class AbstractNumberTableModel extends AbstractTableModel
 
 	
 	public abstract void setValueQuietlyAt(Object value, int row, int col);
-	
+
+	/**
+	 * @return Returns the rows.
+	 */
+	public List getRows()
+		{
+		return rows;
+		}
+
 	}

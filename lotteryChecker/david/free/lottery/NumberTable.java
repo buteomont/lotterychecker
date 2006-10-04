@@ -1,5 +1,7 @@
 package david.free.lottery;
 
+import java.util.Vector;
+
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
@@ -7,45 +9,31 @@ public class NumberTable extends JTable
 	{
 	public NumberTable(final Object[][] rowData, final Object[] columnNames)
 		{
-		super(new AbstractNumberTableModel()
-				{
-					public String getColumnName(int column)
-						{
-						return columnNames[column].toString();
-						}
+		super(new AbstractNumberTableModel(rowData, columnNames)
+			{
+				public boolean isCellEditable(int row, int column)
+					{
+					return column!=3;
+					}
 
-					public int getRowCount()
-						{
-						return rowData.length;
-						}
+				public void setValueAt(Object value, int row, int col)
+					{
+					if (row>super.getRowCount()-2) //always have at least one blank row
+						addRow((Vector)null);
+			        Vector rowVector = (Vector)dataVector.elementAt(row);
+			        rowVector.setElementAt(value, col);
+					fireTableCellUpdated(row, col);
+					}
 
-					public int getColumnCount()
-						{
-						return columnNames.length;
-						}
-
-					public Object getValueAt(int row, int col)
-						{
-						return rowData[row][col];
-						}
-
-					public boolean isCellEditable(int row, int column)
-						{
-						return true;
-						}
-
-					public void setValueAt(Object value, int row, int col)
-						{
-						rowData[row][col]=value;
-						fireTableCellUpdated(row, col);
-						}
-
-					public void setValueQuietlyAt(Object value, int row, int col)
-						{
-						rowData[row][col]=value;
-						}
-
-				});
+				public void setValueQuietlyAt(Object value, int row, int col)
+					{
+					if (row>super.getRowCount()-2) //always have at least one blank row
+						addRow((Vector)null);
+			        Vector rowVector = (Vector)dataVector.elementAt(row);
+			        rowVector.setElementAt(value, col);
+					}
+				
+			});
 		}
 
 	public TableModel getModel()
