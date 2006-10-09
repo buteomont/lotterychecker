@@ -1,8 +1,7 @@
 package david.free.lottery;
 
 import java.io.*;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.table.DefaultTableModel;
 
@@ -44,6 +43,10 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 			in=new ObjectInputStream(fis);
 			rows=(Vector)in.readObject();
 			in.close();
+//			for (Iterator nums=rows.iterator();nums.hasNext();)
+//				{
+//				((Number)nums.next()).start();
+//				}
 			}
 		catch (IOException ex)
 			{

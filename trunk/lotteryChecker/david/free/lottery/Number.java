@@ -16,7 +16,10 @@ public class Number extends Thread implements Serializable
 	private Date drawingDate;
 	private transient List statusListeners=new Vector();
 	private transient PowerBalls.Draw draw;
-	
+	/**
+	 * Set this to true to cause this thread to exit at next pass.
+	 */
+	public transient boolean quit=false;
 	public static final int WHITE_NUMBERS=0; 
 	public static final int POWERBALL=1; 
 	static final String numFlag="<td background=\"/images/ball_white_40.gif\" width=\"39\" height=\"40\"><b><font size=\"5\">";
@@ -104,9 +107,11 @@ public class Number extends Thread implements Serializable
 	
 	public void run()
 		{
+		System.out.println("New Number thread just started.");
+		quit=false;
 		//check the number if it is in the future
 		//If so, don't check it yet
-		while(true)
+		while(!quit)
 			{
 			Calendar cal=Calendar.getInstance();
 			Date now=cal.getTime();
@@ -141,6 +146,10 @@ public class Number extends Thread implements Serializable
 						}
 					else notifyListeners("<html>"+"Sorry, you should have picked these numbers: "+drawnNums+"</html>","");
 					}
+				catch (InterruptedException e)
+					{
+					break; //someone wants to stop
+					}
 				catch (Exception e)
 					{
 					notifyListeners("Error",e.getMessage());
@@ -155,6 +164,7 @@ public class Number extends Thread implements Serializable
 				}
 			}
 		//thread exits here
+		System.out.println("Thread exiting.");
 		}
 	
 	
@@ -385,5 +395,13 @@ public class Number extends Thread implements Serializable
 				break;
 			}
 		return Common.getInstance().normalizeDateString(cal.getTime().toString());
+		}
+	/* (non-Javadoc)
+	 * @see java.lang.Thread#destroy()
+	 */
+	public void destroy()
+		{
+		System.out.println("Thread destroyed.");
+		super.destroy();
 		}
 	}
