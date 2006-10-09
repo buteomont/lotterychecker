@@ -415,7 +415,8 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			model.setValueQuietlyAt(num.getPowerballNumber(), row, 1);
 			model.setValueQuietlyAt(num.getDrawingDateString(), row, 2);
 			num.addStatusListener(getNewNumberStatusListener(row));
-			if (!num.isAlive()) num.start();
+			if (!num.isAlive() && !num.quit) 
+				num.start();
 			row++;
 			}
 		
@@ -451,7 +452,8 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		if (oldnum != null) 
 			{
 			old=oldnum.toString();
-			oldnum.interrupt(); //causes oldnum to exit
+			oldnum.quit=true;  //causes oldnum to exit
+			oldnum.interrupt(); 
 			}
 		
 		mod.setNumber(newnum,row);
@@ -726,22 +728,47 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 					{
 						public void actionPerformed(ActionEvent e)
 							{
-							refresh();
+							try
+								{
+								refresh();
+								}
+							catch (NumberException e1)
+								{
+								e1.printStackTrace();
+								setStatus(e1.row, e1.getMessage());
+								}
 							}
 					});
 			}
 		return refreshMenuItem;
 		}
 
-	protected void refresh()
+	protected void refresh() throws NumberException
 		{
 		AbstractNumberTableModel mod=(AbstractNumberTableModel)getNumberListJTable().getModel();
+		int row=0;
 		for (Iterator nums=mod.getRows().iterator();nums.hasNext();)
 			{
 			Number num=(Number)nums.next();
-			if (num.isAlive()) num.interrupt();
-			num.start();
+			Number newNum;
+			try
+				{
+				newNum=new Number(num.getNumbers(),
+										num.getPowerballNumber(),
+										num.getDrawingDateString(),
+										(NumberStatusListener)num.getStatusListeners().get(0));
+				}
+			catch (Exception e)
+				{
+				e.printStackTrace();
+				throw new NumberException(row, e.getMessage());
+				}
+			mod.rows.set(row, newNum);
+//			newNum.start();  //start the new one
+			num.quit=true;
+			num.interrupt(); //kill the old number
 			}
+		synchronizeRows(mod);
 		}
 
 	/**
