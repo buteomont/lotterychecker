@@ -16,7 +16,7 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 		hydrateRows();
 		}
 
-	public Number setNumber(Number number, int row)
+	public Number setNumber(Number number, int row, boolean startNumber)
 		{
 		Number oldNum=getNumber(row);
 		if (oldNum==null)
@@ -24,6 +24,7 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 				if (getNumber(i)==null)
 					rows.add(i, "");
 		rows.set(row, number);
+		if (startNumber) number.start();
 		return oldNum;
 		}
 
@@ -74,8 +75,6 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 			ex.printStackTrace();
 			}
 		}
-	
-
 	
 	public abstract void setValueQuietlyAt(Object value, int row, int col);
 

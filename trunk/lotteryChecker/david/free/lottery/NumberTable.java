@@ -13,7 +13,7 @@ public class NumberTable extends JTable
 			{
 				public boolean isCellEditable(int row, int column)
 					{
-					return column!=3;
+					return column!=Number.COLUMN_STATUS;
 					}
 
 				public void setValueAt(Object value, int row, int col)

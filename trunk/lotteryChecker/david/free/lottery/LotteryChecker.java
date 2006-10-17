@@ -46,6 +46,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	private JLabel jLabel1 = null;
 	private JPanel spacerJPanel = null;
 	private JMenuItem refreshMenuItem = null;
+	private String[] headers=new String[] { "Numbers", "PB", "PP", "Draw Date", "Status" };
 	public LotteryChecker() throws HeadlessException
 		{
 		super();
@@ -345,20 +346,24 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		{
 		if (numberListJTable==null)
 			{
-			numberListJTable=new NumberTable((Object[][])new String[10][4], (Object[])new String[] { "Numbers", "PB", "Draw Date", "Status" });
+			numberListJTable=new NumberTable((Object[][])new Object[10][headers.length], (Object[])headers);
 			TableColumnModel mod=numberListJTable.getColumnModel();
-			mod.getColumn(0).setCellRenderer(new LotteryCellRenderer(this));
-			mod.getColumn(1).setCellRenderer(new LotteryCellRenderer(this));
-			mod.getColumn(3).setPreferredWidth(50);
-			mod.getColumn(2).setPreferredWidth(80);
-			mod.getColumn(2).setMaxWidth(80);
-			mod.getColumn(2).setMinWidth(80);
-			mod.getColumn(1).setPreferredWidth(30);
-			mod.getColumn(1).setMaxWidth(30);
-			mod.getColumn(1).setMinWidth(30);
-			mod.getColumn(0).setPreferredWidth(90);
-			mod.getColumn(0).setMaxWidth(90);
-			mod.getColumn(0).setMinWidth(90);
+			mod.getColumn(Number.COLUMN_WHITE_NUMBERS).setCellRenderer(new LotteryCellRenderer(this));
+			mod.getColumn(Number.COLUMN_POWERBALL_NUMBER).setCellRenderer(new LotteryCellRenderer(this));
+			mod.getColumn(Number.COLUMN_STATUS).setPreferredWidth(50);
+			mod.getColumn(Number.COLUMN_DRAW_DATE).setPreferredWidth(80);
+			mod.getColumn(Number.COLUMN_DRAW_DATE).setMaxWidth(80);
+			mod.getColumn(Number.COLUMN_DRAW_DATE).setMinWidth(80);
+			mod.getColumn(Number.COLUMN_POWER_PLAY).setCellEditor(new DefaultCellEditor(new JCheckBox()));
+			mod.getColumn(Number.COLUMN_POWER_PLAY).setMinWidth(30);
+			mod.getColumn(Number.COLUMN_POWER_PLAY).setMaxWidth(30);
+			mod.getColumn(Number.COLUMN_POWER_PLAY).setPreferredWidth(30);
+			mod.getColumn(Number.COLUMN_POWERBALL_NUMBER).setPreferredWidth(30);
+			mod.getColumn(Number.COLUMN_POWERBALL_NUMBER).setMaxWidth(30);
+			mod.getColumn(Number.COLUMN_POWERBALL_NUMBER).setMinWidth(30);
+			mod.getColumn(Number.COLUMN_WHITE_NUMBERS).setPreferredWidth(90);
+			mod.getColumn(Number.COLUMN_WHITE_NUMBERS).setMaxWidth(90);
+			mod.getColumn(Number.COLUMN_WHITE_NUMBERS).setMinWidth(90);
 			((DefaultTableCellRenderer)numberListJTable.getTableHeader().getDefaultRenderer())
 				.setHorizontalAlignment(SwingConstants.CENTER);
 			numberListJTable.setToolTipText("Enter your 5 numbers here (separated by spaces), your powerball number, and the draw date.");
@@ -399,27 +404,35 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		if (rows.size()>row)
 			{
 			Number number=(Number)rows.get(row);
-			if (column==0) return number.getPattern(Number.WHITE_NUMBERS);
-			else return number.getPattern(Number.POWERBALL);
+			if (column==Number.COLUMN_WHITE_NUMBERS) return number.getPattern(Number.COLUMN_WHITE_NUMBERS);
+			else return number.getPattern(Number.COLUMN_POWERBALL_NUMBER);
 			}
 		else return 0;
 		}
 	
 	private void synchronizeRows(AbstractNumberTableModel model)
 		{
+		Vector baddies=new Vector();
 		int row=0;
 		for (Iterator i=model.rows.iterator(); i.hasNext();)
 			{
-			Number num=(Number)i.next();
-			model.setValueQuietlyAt(num.getNumbers(), row, 0);
-			model.setValueQuietlyAt(num.getPowerballNumber(), row, 1);
-			model.setValueQuietlyAt(num.getDrawingDateString(), row, 2);
-			num.addStatusListener(getNewNumberStatusListener(row));
-			if (!num.isAlive() && !num.quit) 
-				num.start();
-			row++;
+			Object o=i.next();
+			if (o instanceof Number)
+				{
+				Number num=(Number)o;
+				model.setValueQuietlyAt(num.getNumbers(), row, Number.COLUMN_WHITE_NUMBERS);
+				model.setValueQuietlyAt(num.getPowerballNumber(), row, Number.COLUMN_POWERBALL_NUMBER);
+				model.setValueQuietlyAt(num.getPowerPlay(), row, Number.COLUMN_POWER_PLAY);
+				model.setValueQuietlyAt(num.getDrawingDateString(), row, Number.COLUMN_DRAW_DATE);
+				num.addStatusListener(getNewNumberStatusListener(row));
+				if (!num.isAlive() && !num.quit) 
+					num.start();
+				row++;
+				}
+			else baddies.add(o);
 			}
-		
+		for (Iterator i=baddies.iterator();i.hasNext();)
+			model.rows.remove(i.next());
 		}
 
 	protected void updateNumbers(int row)
@@ -427,25 +440,42 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		AbstractNumberTableModel mod=(AbstractNumberTableModel)getNumberListJTable().getModel();
 
 		//ignore any input until the whole row is complete
-		for (int c=0;c<3;c++)
+		for (int c=0;c<Number.COLUMN_STATUS;c++)
 			{
 			if (mod.getValueAt(row, c)==null)
+				{
+				if (mod.getValueAt(row, Number.COLUMN_POWER_PLAY)==null)
+					mod.setValueQuietlyAt(new Boolean(false), row, Number.COLUMN_POWER_PLAY);
 				return;
+				}
 			}
 		Number newnum=null;
 		try
 			{
-			newnum=new Number((String)mod.getValueAt(row, 0),
-									(String)mod.getValueAt(row, 1), 
-									(String)mod.getValueAt(row, 2),
+			newnum=new Number((String)mod.getValueAt(row, Number.COLUMN_WHITE_NUMBERS),
+									(String)mod.getValueAt(row, Number.COLUMN_POWERBALL_NUMBER), 
+									(Boolean)mod.getValueAt(row, Number.COLUMN_POWER_PLAY),
+									(String)mod.getValueAt(row, Number.COLUMN_DRAW_DATE),
 									getNewNumberStatusListener(row));
-			mod.setValueQuietlyAt(newnum.getDrawingDateString(), row, 2);
 			}
 		catch (Exception e)
 			{
 			setStatus(row,"Error");
 			setMessage(e.getMessage());
 			return;
+			}
+		
+		messageJLabel.setText("");
+		
+//		replace with sanctified numbers
+		mod.setValueQuietlyAt(newnum.getNumbers(), row, Number.COLUMN_WHITE_NUMBERS); 
+		mod.setValueQuietlyAt(newnum.getPowerballNumber(), row, Number.COLUMN_POWERBALL_NUMBER); 
+		mod.setValueQuietlyAt(newnum.getDrawingDateString(), row, Number.COLUMN_DRAW_DATE);
+
+		if (mod.rows.contains(newnum)) 
+			{
+			setStatus(row,"Error - duplicate number.");
+			setMessage("Duplicate number.");
 			}
 		Number oldnum=mod.getNumber(row);
 		String old=null;
@@ -455,22 +485,15 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			oldnum.quit=true;  //causes oldnum to exit
 			oldnum.interrupt(); 
 			}
-		
-		mod.setNumber(newnum,row);
-		
-		messageJLabel.setText("");
-		
-//		replace with sanctified numbers
-		mod.setValueQuietlyAt(newnum.getNumbers(), row, 0); 
-		mod.setValueQuietlyAt(newnum.getPowerballNumber(), row, 1); 
-		
+	
+		mod.setNumber(newnum,row,!mod.rows.contains(newnum)); //don't start it if it's a dupe
+	
 		if (oldnum==null)
 			System.out.println("Number "+newnum+" added.");
 		else
 			{
 			System.out.println("Number "+old+" replaced with "+newnum);
 			}
-		
 		}
 
 	private NumberStatusListener getNewNumberStatusListener(final int row)
@@ -489,13 +512,15 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		{
 		System.out.println("Row "+row+": "+text);
 		AbstractNumberTableModel mod=(AbstractNumberTableModel)getNumberListJTable().getModel();
-		mod.setValueQuietlyAt(text, row, 3);
+		mod.setValueQuietlyAt(text, row, Number.COLUMN_STATUS);
 		repaint();
 		}
 
 	private void setMessage(String message)
 		{
 		messageJLabel.setText(message);
+		if (message!=null && message.trim().length()>0)
+			System.out.println(message);
 		}
 
 	/**
@@ -544,6 +569,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			{
 			Number newnum=new Number(orignum.getNumbers(),
 									 orignum.getPowerballNumber(),
+									 orignum.getPowerPlay(),
 									 Number.getNextDrawingAfter(orignum.getDrawingDateString()),
 									 getNewNumberStatusListener(mod.rows.size()));
 			mod.rows.add(newnum);
@@ -603,15 +629,17 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		model.rows.remove(row);
 		for (;row<model.rows.size();row++)
 			{
-			model.setValueQuietlyAt(model.getValueAt(row+1, 0), row, 0);
-			model.setValueQuietlyAt(model.getValueAt(row+1, 1), row, 1);
-			model.setValueQuietlyAt(model.getValueAt(row+1, 2), row, 2);
-			model.setValueQuietlyAt(model.getValueAt(row+1, 3), row, 3);
+			model.setValueQuietlyAt(model.getValueAt(row+1, Number.COLUMN_WHITE_NUMBERS), row, Number.COLUMN_WHITE_NUMBERS);
+			model.setValueQuietlyAt(model.getValueAt(row+1, Number.COLUMN_POWERBALL_NUMBER), row, Number.COLUMN_POWERBALL_NUMBER);
+			model.setValueQuietlyAt(model.getValueAt(row+1, Number.COLUMN_POWER_PLAY), row, Number.COLUMN_POWER_PLAY);
+			model.setValueQuietlyAt(model.getValueAt(row+1, Number.COLUMN_DRAW_DATE), row, Number.COLUMN_DRAW_DATE);
+			model.setValueQuietlyAt(model.getValueAt(row+1, Number.COLUMN_STATUS), row, Number.COLUMN_STATUS);
 			}
-		model.setValueQuietlyAt("", row, 0);
-		model.setValueQuietlyAt("", row, 1);
-		model.setValueQuietlyAt("", row, 2);
-		model.setValueQuietlyAt("", row, 3);
+		model.setValueQuietlyAt("", row, Number.COLUMN_WHITE_NUMBERS);
+		model.setValueQuietlyAt("", row, Number.COLUMN_POWERBALL_NUMBER);
+		model.setValueQuietlyAt("", row, Number.COLUMN_POWER_PLAY);
+		model.setValueQuietlyAt("", row, Number.COLUMN_DRAW_DATE);
+		model.setValueQuietlyAt("", row, Number.COLUMN_STATUS);
 		}
 
 	/**
@@ -755,6 +783,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 				{
 				newNum=new Number(num.getNumbers(),
 										num.getPowerballNumber(),
+										num.getPowerPlay(),
 										num.getDrawingDateString(),
 										(NumberStatusListener)num.getStatusListeners().get(0));
 				}
@@ -782,7 +811,10 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 
 	public void updateJackpotAmount(int jackpotAmount)
 		{
-		jackpotAmountJLabel.setText("$"+jackpotAmount+" Million");
+		if (jackpotAmount>0)
+			jackpotAmountJLabel.setText("$"+jackpotAmount+" Million");
+		else
+			jackpotAmountJLabel.setText("Unknown");
 		}
 
 	public void updateNews(String news)
