@@ -11,6 +11,7 @@ public class Number extends Thread implements Serializable
 	{
 	private String[] numbs=new String[5];
 	private String pb;
+	private Boolean powerPlay=new Boolean(false);
 	private int maxWhite=55;
 	private int maxPB=42;
 	private Date drawingDate;
@@ -20,8 +21,14 @@ public class Number extends Thread implements Serializable
 	 * Set this to true to cause this thread to exit at next pass.
 	 */
 	public transient boolean quit=false;
-	public static final int WHITE_NUMBERS=0; 
-	public static final int POWERBALL=1; 
+	
+	private static int tempColNum=0;
+	public static final int COLUMN_WHITE_NUMBERS = tempColNum++;
+	public static final int COLUMN_POWERBALL_NUMBER = tempColNum++;
+	public static final int COLUMN_POWER_PLAY = tempColNum++;
+	public static final int COLUMN_DRAW_DATE = tempColNum++;
+	public static final int COLUMN_STATUS = tempColNum++;
+
 	static final String numFlag="<td background=\"/images/ball_white_40.gif\" width=\"39\" height=\"40\"><b><font size=\"5\">";
 	static final String pbFlag="<td background=\"/images/ball_red_40.gif\" width=\"39\" height=\"40\"><b><font size=\"5\">";
 	
@@ -29,7 +36,7 @@ public class Number extends Thread implements Serializable
 		{
 		super();
 		}
-	public Number(String nums, String pb, String drawDate, NumberStatusListener listener) throws Exception
+	public Number(String nums, String pb, Boolean powerPlay, String drawDate, NumberStatusListener listener) throws Exception
 		{
 		this();
 		addStatusListener(listener);
@@ -73,7 +80,8 @@ public class Number extends Thread implements Serializable
 			throw new Exception("\""+drawDate+"\" is not a Wednesday or Saturday.");		
 		if (drawingDate==null) 
 			throw new Exception("\""+drawDate+"\" is not a valid date.");
-		start();  //let this thread go
+		this.powerPlay=powerPlay;
+//		start();  //let this thread go
 		}
 	
 	/**
@@ -85,24 +93,29 @@ public class Number extends Thread implements Serializable
 	public int getPattern(int column)
 		{
 		if (draw==null)return 0; //no winner yet
-		if (column==POWERBALL)
+		if (column==COLUMN_POWERBALL_NUMBER)
 			{
 			if (getPowerballNumber().equals(draw.powerballNumber)) return 1;
 			else return 0;
 			}
-		else if (column==WHITE_NUMBERS)
+		else if (column==COLUMN_WHITE_NUMBERS)
 			{
-			int pattern=0;
-			String drawnNums=" "+buildDrawnNumberString()+" ";
-			for (int i=0;i<numbs.length;i++)
-				{
-				pattern=pattern<<1;
-				if (drawnNums.indexOf(" "+numbs[i]+" ")>=0)
-					pattern++;
-				}
-			return pattern;
+			return buildPattern(buildDrawnNumberString());
 			}
 		else return 0;	
+		}
+	
+	private int buildPattern(String drawnNums)
+		{
+		int pattern=0;
+		drawnNums=" "+drawnNums+" ";
+		for (int i=0;i<numbs.length;i++)
+			{
+			pattern=pattern<<1;
+			if (drawnNums.indexOf(" "+numbs[i]+" ")>=0)
+				pattern++;
+			}
+		return pattern;
 		}
 	
 	public void run()
@@ -245,6 +258,8 @@ public class Number extends Thread implements Serializable
 			else if (check4Prize(drawnNums,drawnPB)) results= 4; 
 			else if (check3Prize(drawnPB)) results= 3;
 			else results=0;
+			if (powerPlay.booleanValue())
+				results*=Integer.parseInt((draw.powerplayNumber));
 			}
 		return results;
 		}
@@ -403,5 +418,35 @@ public class Number extends Thread implements Serializable
 		{
 		System.out.println("Thread destroyed.");
 		super.destroy();
+		}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object obj)
+		{
+		boolean eq=true;
+		if (obj==null) eq=false; 
+		else if	(!(obj instanceof Number)) eq=false;
+		else if (obj==this) eq=false; //same object treated as not equal
+		else
+			{
+			Number candidate=(Number)obj;
+			if (buildPattern(candidate.getNumbers())<31) eq=false;
+			else if (!getPowerballNumber().equals(candidate.getPowerballNumber())) eq=false;
+			else if (!isPowerPlay()==candidate.isPowerPlay()) eq=false;
+			else if (!getDrawingDateString().equals(candidate.getDrawingDateString())) eq=false;
+			}
+		return eq;
+		}
+	/**
+	 * @return Returns the powerPlay.
+	 */
+	public Boolean getPowerPlay()
+		{
+		return powerPlay;
+		}
+	public boolean isPowerPlay()
+		{
+		return powerPlay.booleanValue();
 		}
 	}

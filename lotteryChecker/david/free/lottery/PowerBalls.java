@@ -100,19 +100,26 @@ public class PowerBalls
 		if (page==null || page.length()==0) throw new Exception("Unable to fetch powerball jackpot amount.");
 		int start=page.indexOf(jackpotAmountStart)+jackpotAmountStart.length();
 		int end=page.indexOf(jackpotAmountEnd, start);
-		String jackpot=page.substring(start,end).trim();
+		String jackpot="";
+		if (start>0 && end>start)
+			jackpot=page.substring(start,end).trim();
 		if (handy.isANumber(jackpot))
 			jackpotAmount=Integer.parseInt(jackpot);
 		else 
-			throw new Exception("Unable to find powerball jackpot amount.");
+			jackpotAmount=0;
+			//throw new Exception("Unable to find powerball jackpot amount.");
 		
 		//now the news:
 		start=page.lastIndexOf(newsStart)+newsStart.length();
 		end=page.indexOf(newsEnd, start);
-		news=page.substring(start,end).trim();
-		news=handy.substitute(news, "\\", "");
+		if (start>0 && end>start)
+			{
+			news=page.substring(start,end).trim();
+			news=handy.substitute(news, "\\", "");
+			}
 		if (news==null || news.length()==0)
-			throw new Exception("Unable to find powerball news.");
+			news="Unable to find powerball news.";
+//			throw new Exception("Unable to find powerball news.");
 
 		notifyJackpotListeners();
 		}
