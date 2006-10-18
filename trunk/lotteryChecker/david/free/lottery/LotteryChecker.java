@@ -446,8 +446,8 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			{
 			if (mod.getValueAt(row, c)==null)
 				{
-				if (mod.getValueAt(row, Number.COLUMN_POWER_PLAY)==null)
-					mod.setValueQuietlyAt(new Boolean(false), row, Number.COLUMN_POWER_PLAY);
+//				if (mod.getValueAt(row, Number.COLUMN_POWER_PLAY)==null)
+//					mod.setValueQuietlyAt(new Boolean(false), row, Number.COLUMN_POWER_PLAY);
 				return;
 				}
 			}

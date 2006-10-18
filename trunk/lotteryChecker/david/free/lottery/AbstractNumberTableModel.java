@@ -16,6 +16,16 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 		super(data, columnNames);
 		hydrateRows();
 		}
+	/*
+	* JTable uses this method to determine the default renderer/
+	* editor for each cell. If we didn't implement this method,
+	* then the last column would contain text ("true"/"false"),
+	* rather than a check box.
+	*/
+	public Class getColumnClass(int column) 
+		{
+		return getValueAt(0, column).getClass();
+		}
 
 	public Number setNumber(Number number, int row, boolean startNumber)
 		{
