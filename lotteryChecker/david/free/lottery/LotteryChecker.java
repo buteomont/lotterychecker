@@ -390,7 +390,9 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 					{
 					public void tableChanged(TableModelEvent e) 
 						{
-						updateNumbers(e.getFirstRow());
+						if (e.getSource() instanceof AbstractNumberTableModel)
+							if (!((AbstractNumberTableModel)e.getSource()).isAddingEmptyRow())
+								updateNumbers(e.getFirstRow());
 						}
 					});
 			synchronizeRows((AbstractNumberTableModel)numberListJTable.getModel());
