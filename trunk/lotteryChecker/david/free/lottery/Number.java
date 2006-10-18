@@ -177,6 +177,7 @@ public class Number extends Thread implements Serializable
 				}
 			}
 		//thread exits here
+		quit=true;
 		System.out.println("Thread exiting.");
 		}
 	

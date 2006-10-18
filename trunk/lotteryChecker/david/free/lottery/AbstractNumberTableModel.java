@@ -9,6 +9,7 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 	{
 	public final static String filename="lottery.ser";
 	List	rows	=new Vector(); //this gets serialized to disk when saving
+	protected boolean	addingEmptyRow;
 
 	public AbstractNumberTableModel(Object[][] data, Object[] columnNames)
 		{
@@ -84,6 +85,11 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 	public List getRows()
 		{
 		return rows;
+		}
+
+	public boolean isAddingEmptyRow()
+		{
+		return addingEmptyRow;
 		}
 
 	}

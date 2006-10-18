@@ -19,16 +19,29 @@ public class NumberTable extends JTable
 				public void setValueAt(Object value, int row, int col)
 					{
 					if (row>super.getRowCount()-2) //always have at least one blank row
-						addRow((Vector)null);
+						addEmptyRow();
 			        Vector rowVector = (Vector)dataVector.elementAt(row);
 			        rowVector.setElementAt(value, col);
 					fireTableCellUpdated(row, col);
 					}
 
+				private void addEmptyRow()
+					{
+					try
+						{
+						addingEmptyRow=true;
+						addRow((Vector)null);
+						}
+					finally
+						{
+						addingEmptyRow=false;
+						}
+					}
+
 				public void setValueQuietlyAt(Object value, int row, int col)
 					{
 					if (row>super.getRowCount()-2) //always have at least one blank row
-						addRow((Vector)null);
+						addEmptyRow();
 			        Vector rowVector = (Vector)dataVector.elementAt(row);
 			        rowVector.setElementAt(value, col);
 					}
