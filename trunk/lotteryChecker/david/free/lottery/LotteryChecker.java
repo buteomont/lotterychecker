@@ -9,10 +9,8 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import java.awt.BorderLayout;
-import javax.swing.JMenuItem;
+
+import david.util.Common;
 
 public class LotteryChecker extends JFrame implements LotteryListener, JackpotListener
 	{
@@ -47,6 +45,12 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	private JPanel spacerJPanel = null;
 	private JMenuItem refreshMenuItem = null;
 	private String[] headers=new String[] { "Numbers", "PB", "PP", "Draw Date", "Status" };
+	private JDialog duplicateCountjDialog = null;  //  @jve:decl-index=0:visual-constraint="339,186"
+	private JPanel duplicateCountjContentPane = null;
+	private JTextField duplicateCountjTextField = null;
+	private JLabel jLabel = null;
+	private JLabel jLabel2 = null;
+	protected boolean running=true;
 	public LotteryChecker() throws HeadlessException
 		{
 		super();
@@ -95,14 +99,35 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		this.setContentPane(getJContentPane());
 		this.setTitle("Powerball Checker");
 		this.messageJLabel.setText("");
-		this.addWindowListener(new WindowAdapter()
+		
+		//keep the news and jackpot up to date
+		final Thread newsThread=new Thread()
+			{
+			public void run()
 				{
-				public void windowClosing(WindowEvent e)
+				while (running)
 					{
-					save();
-					super.windowClosing(e);
+					try
+						{
+						sleep(60000);
+						PowerBalls.getInstance(); //we are already a listener
+						}
+					catch (Exception e){}
 					}
-			});
+				}
+			};
+			newsThread.start();
+			
+			this.addWindowListener(new WindowAdapter()
+					{
+					public void windowClosing(WindowEvent e)
+						{
+						running=false;
+						newsThread.interrupt();
+						save();
+						super.windowClosing(e);
+						}
+				});
 		}
 
 	/**
@@ -379,7 +404,8 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 							{
 							lastRowClicked=getNumberListJTable().rowAtPoint(e.getPoint()); 
 							Point menuloc=e.getPoint();
-							menuloc.translate(getX(), getY()+getContentPane().getY());
+//							menuloc.translate(getX(), getY()+getContentPane().getY());
+							menuloc.translate(getLocationOnScreen().x,getLocationOnScreen().y);
 							getOptionJPopupMenu().setLocation(menuloc);
 							getOptionJPopupMenu().setVisible(true);
 							e.consume();
@@ -551,38 +577,46 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		if (duplicateJMenuItem==null)
 			{
 			duplicateJMenuItem=new JMenuItem();
-			duplicateJMenuItem.setText("Duplicate Row");
+			duplicateJMenuItem.setText("Duplicate this row...");
 			duplicateJMenuItem.addActionListener(new ActionListener()
 				{
 				public void actionPerformed(ActionEvent e)
 					{
-					duplicateRow();
+					int x=getLocationOnScreen().x+getWidth()/2-getDuplicateCountjDialog().getWidth()/2;
+					int y=getLocationOnScreen().y+getHeight()/2-getDuplicateCountjDialog().getHeight()/2;
+					getDuplicateCountjDialog().setLocation(x,y);
+					getDuplicateCountjDialog().setVisible(true);
 					}
 				});
 			}
 		return duplicateJMenuItem;
 		}
 
-	protected void duplicateRow()
+	protected void duplicateRow(int count)
 		{
 		AbstractNumberTableModel mod=(AbstractNumberTableModel)getNumberListJTable().getModel();
 		Number orignum=(Number)mod.rows.get(lastRowClicked);
-		try
+		while (count-->0)
 			{
-			Number newnum=new Number(orignum.getNumbers(),
-									 orignum.getPowerballNumber(),
-									 orignum.getPowerPlay(),
-									 Number.getNextDrawingAfter(orignum.getDrawingDateString()),
-									 getNewNumberStatusListener(mod.rows.size()));
-			mod.rows.add(newnum);
-			getOptionJPopupMenu().setVisible(false);
-			if (mod.rows.size()>=10)
-				addEmptyRow();
-			synchronizeRows(mod);
-			}
-		catch (Exception e)
-			{
-			e.printStackTrace();
+			try
+				{
+				Number newnum=new Number(orignum.getNumbers(),
+										 orignum.getPowerballNumber(),
+										 orignum.getPowerPlay(),
+										 Number.getNextDrawingAfter(orignum.getDrawingDateString()),
+										 getNewNumberStatusListener(mod.rows.size()));
+				mod.rows.add(newnum);
+				getOptionJPopupMenu().setVisible(false);
+//				if (mod.rows.size()>=10)
+//					addEmptyRow();
+				synchronizeRows(mod);
+				orignum=(Number)mod.rows.get(mod.rows.size()-1);
+				}
+			catch (Exception e)
+				{
+				e.printStackTrace();
+				break;
+				}
 			}
 		}
 
@@ -639,7 +673,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			}
 		model.setValueQuietlyAt("", row, Number.COLUMN_WHITE_NUMBERS);
 		model.setValueQuietlyAt("", row, Number.COLUMN_POWERBALL_NUMBER);
-		model.setValueQuietlyAt("", row, Number.COLUMN_POWER_PLAY);
+		model.setValueQuietlyAt(new Boolean(false), row, Number.COLUMN_POWER_PLAY);
 		model.setValueQuietlyAt("", row, Number.COLUMN_DRAW_DATE);
 		model.setValueQuietlyAt("", row, Number.COLUMN_STATUS);
 		}
@@ -737,11 +771,11 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			}
 		return spacerJPanel;
 		}
-	private void addEmptyRow()
-		{
-		DefaultTableModel mod=(DefaultTableModel)getNumberListJTable().getModel();
-		mod.addRow((Vector) null);
-		}
+//	private void addEmptyRow()
+//		{
+//		DefaultTableModel mod=(DefaultTableModel)getNumberListJTable().getModel();
+//		mod.addRow((Vector) null);
+//		}
 
 	/**
 	 * This method initializes refreshMenuItem	
@@ -800,6 +834,72 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			num.interrupt(); //kill the old number
 			}
 		synchronizeRows(mod);
+		}
+
+	/**
+	 * This method initializes duplicateCountjDialog	
+	 * 	
+	 * @return javax.swing.JDialog	
+	 */
+	private JDialog getDuplicateCountjDialog()
+		{
+		if (duplicateCountjDialog==null)
+			{
+			duplicateCountjDialog=new JDialog();
+			duplicateCountjDialog.setSize(new java.awt.Dimension(188,76));
+			duplicateCountjDialog.setModal(true);
+			duplicateCountjDialog.setTitle("Enter a number");
+			duplicateCountjDialog.setContentPane(getDuplicateCountjContentPane());
+			}
+		return duplicateCountjDialog;
+		}
+
+	/**
+	 * This method initializes duplicateCountjContentPane	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getDuplicateCountjContentPane()
+		{
+		if (duplicateCountjContentPane==null)
+			{
+			jLabel2 = new JLabel();
+			jLabel2.setText("Duplicate ");
+			jLabel = new JLabel();
+			jLabel.setText("times.");
+			duplicateCountjContentPane=new JPanel();
+			duplicateCountjContentPane.setLayout(new FlowLayout());
+			duplicateCountjContentPane.add(jLabel2, null);
+			duplicateCountjContentPane.add(getDuplicateCountjTextField(), null);
+			duplicateCountjContentPane.add(jLabel, null);
+			}
+		return duplicateCountjContentPane;
+		}
+
+	/**
+	 * This method initializes duplicateCountjTextField	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getDuplicateCountjTextField()
+		{
+		if (duplicateCountjTextField==null)
+			{
+			duplicateCountjTextField=new JTextField();
+			duplicateCountjTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+			duplicateCountjTextField.setPreferredSize(new java.awt.Dimension(30,20));
+			duplicateCountjTextField.addActionListener(new ActionListener()
+				{
+				public void actionPerformed(ActionEvent e)
+					{
+					String count=((JTextField)e.getSource()).getText();
+					if (Common.getInstance().isANumber(count))
+						duplicateRow(Integer.parseInt(count));
+					getDuplicateCountjDialog().setVisible(false);
+					}
+				});
+			}
+		return duplicateCountjTextField;
 		}
 
 	/**
