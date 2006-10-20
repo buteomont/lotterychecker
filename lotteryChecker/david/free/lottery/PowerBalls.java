@@ -81,14 +81,14 @@ public class PowerBalls
 			
 			Draw draw=instance.new Draw();
 			StringTokenizer lTok=new StringTokenizer(line);
-			if (lTok.hasMoreTokens()) draw.drawDate=lTok.nextToken();
-			if (lTok.hasMoreTokens()) draw.whiteNumbers[0]=lTok.nextToken();
-			if (lTok.hasMoreTokens()) draw.whiteNumbers[1]=lTok.nextToken();
-			if (lTok.hasMoreTokens()) draw.whiteNumbers[2]=lTok.nextToken();
-			if (lTok.hasMoreTokens()) draw.whiteNumbers[3]=lTok.nextToken();
-			if (lTok.hasMoreTokens()) draw.whiteNumbers[4]=lTok.nextToken();
-			if (lTok.hasMoreTokens()) draw.powerballNumber=lTok.nextToken();
-			if (lTok.hasMoreTokens()) draw.powerplayNumber=lTok.nextToken();
+			if (lTok.hasMoreTokens()) draw.drawDate=lTok.nextToken(); else continue;
+			if (lTok.hasMoreTokens()) draw.whiteNumbers[0]=lTok.nextToken(); else continue;
+			if (lTok.hasMoreTokens()) draw.whiteNumbers[1]=lTok.nextToken(); else continue;
+			if (lTok.hasMoreTokens()) draw.whiteNumbers[2]=lTok.nextToken(); else continue;
+			if (lTok.hasMoreTokens()) draw.whiteNumbers[3]=lTok.nextToken(); else continue;
+			if (lTok.hasMoreTokens()) draw.whiteNumbers[4]=lTok.nextToken(); else continue;
+			if (lTok.hasMoreTokens()) draw.powerballNumber=lTok.nextToken(); else continue;
+			if (lTok.hasMoreTokens()) draw.powerplayNumber=lTok.nextToken(); else continue;
 			Arrays.sort(draw.whiteNumbers);
 			instance.getDrawings().put(draw.drawDate, draw);
 			}
