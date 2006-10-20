@@ -109,7 +109,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 					{
 					try
 						{
-						sleep(60000);
+						sleep(900000);
 						PowerBalls.getInstance(); //we are already a listener
 						}
 					catch (Exception e){}
