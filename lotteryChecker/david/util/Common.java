@@ -542,5 +542,42 @@ public final String substituteMany(String original, Hashtable parms)
 		}
 	return original;
 	}
-}
+/**
+ * Reads a file.  100% Java compliant (no system calls)
+ * 
+ * @param String sourceFileName
+ */
+public byte[] readFile(String sourceFileName)
+	throws java.io.IOException
+	{
+	java.io.InputStream in = null;
+	byte[] buf = null;
+	try
+		{//try from disk file first
+		in = new java.io.FileInputStream(sourceFileName);
+		}
+	catch (FileNotFoundException e)
+		{//no file, try from all jars in the classpath
+		in=getClass().getResourceAsStream("/"+sourceFileName);
+		}
+	try 
+		{
+		StringBuffer sb=new StringBuffer();
+		BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		String line=null;
+		while ((line = br.readLine()) != null) 
+			{  
+			sb.append(line);
+			}
+		buf=sb.toString().getBytes();
+		}
+	finally 
+		{
+		in.close();
+		}
+	
+	return buf;
+	}
+
+	}
 
