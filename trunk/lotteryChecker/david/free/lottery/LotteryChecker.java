@@ -14,6 +14,8 @@ import david.util.Common;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import java.io.IOException;
+
 import javax.swing.JLabel;
 import javax.swing.JButton;
 
@@ -22,7 +24,6 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 
 	protected static final String	aboutText	="<html><center><h3>Powerball Lottery Checker</h3><small>by </small><b>David E. Powell</b><br><i>david@depowell.com</i></center></html>";
 	private static final String	SPLASH_PAGE	="http://www.depowell.com/lotterySplashMsg.html";
-	private static final String ALT_SPLASH_MSG	= "<html> <body> <center> <h1>David's Powerball Lottery Checker</h1> This program is free for you to use as you wish, with two stipulations.<br></center> <ol> <li> The source code for this program is freely available.  If you distribute, modify, enhance, or otherwise change it, credit must be given to the original author. Please don't steal my work and claim it as your own.<br></li> <li> If you are using this program, and you win any money from the Powerball lottery, you agree to donate a small percentage of your winnings to me.  The amount that you donate is entirely up to you, and should be based on how helpful that you feel this program is. Of course, I hope that it is greater than zero! <br><br>Donations can be sent to:<br><b>David Powell<br>1808 Burke Hollow Rd.<br>Nolensville, TN 37135<br>Paypal: david@depowell.com</b></li> </ol> <center><h2>Good Luck!</h2></center> </body> </html>";
 	private JPanel		jContentPane	=null;
 	private JMenuBar	jJMenuBar		=null;
 	private JMenu		fileMenu		=null;
@@ -800,11 +801,6 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			}
 		return spacerJPanel;
 		}
-//	private void addEmptyRow()
-//		{
-//		DefaultTableModel mod=(DefaultTableModel)getNumberListJTable().getModel();
-//		mod.addRow((Vector) null);
-//		}
 
 	/**
 	 * This method initializes refreshMenuItem	
@@ -861,6 +857,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 //			newNum.start();  //start the new one
 			num.quit=true;
 			num.interrupt(); //kill the old number
+			row++;
 			}
 		synchronizeRows(mod);
 		}
@@ -962,8 +959,16 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			{
 			splashText = new JLabel();
 			String msg=Common.getInstance().getPage(SPLASH_PAGE);
-			if (msg.toLowerCase().indexOf("error")>=0 || msg.toLowerCase().indexOf("exception")>=0)
-				msg=ALT_SPLASH_MSG;
+			if (msg.toLowerCase().indexOf("error")>=0 || msg.toLowerCase().indexOf("exception")>=0) 
+				try
+					{
+					msg=new String(Common.getInstance().readFile("lotterySplashMsg.html"));
+					}
+				catch (IOException e)
+					{
+					e.printStackTrace();
+					System.exit(-1);
+					}
 			splashText.setText(msg);
 			splashText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 			splashContentPane=new JPanel();
