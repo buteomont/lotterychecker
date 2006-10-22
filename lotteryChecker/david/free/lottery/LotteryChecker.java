@@ -11,11 +11,18 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
 
 import david.util.Common;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import javax.swing.JLabel;
+import javax.swing.JButton;
 
 public class LotteryChecker extends JFrame implements LotteryListener, JackpotListener
 	{
 
-	protected static final String	aboutText	="<html><center><h3>Powerball Lottery Checker</h3><small>by </small><b>David E. Powell</b></center></html>";
+	protected static final String	aboutText	="<html><center><h3>Powerball Lottery Checker</h3><small>by </small><b>David E. Powell</b><br><i>david@depowell.com</i></center></html>";
+	private static final String	SPLASH_PAGE	="http://www.depowell.com/lotterySplashMsg.html";
+	private static final String ALT_SPLASH_MSG	= "<html> <body> <center> <h1>David's Powerball Lottery Checker</h1> This program is free for you to use as you wish, with two stipulations.<br></center> <ol> <li> The source code for this program is freely available.  If you distribute, modify, enhance, or otherwise change it, credit must be given to the original author. Please don't steal my work and claim it as your own.<br></li> <li> If you are using this program, and you win any money from the Powerball lottery, you agree to donate a small percentage of your winnings to me.  The amount that you donate is entirely up to you, and should be based on how helpful that you feel this program is. Of course, I hope that it is greater than zero! <br><br>Donations can be sent to:<br><b>David Powell<br>1808 Burke Hollow Rd.<br>Nolensville, TN 37135<br>Paypal: david@depowell.com</b></li> </ol> <center><h2>Good Luck!</h2></center> </body> </html>";
 	private JPanel		jContentPane	=null;
 	private JMenuBar	jJMenuBar		=null;
 	private JMenu		fileMenu		=null;
@@ -30,11 +37,11 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	private JScrollPane numberListJScrollPane = null;
 	private NumberTable numberListJTable = null;
 	private JLabel messageJLabel = null;
-	private JPopupMenu optionJPopupMenu = null;  //  @jve:decl-index=0:visual-constraint="698,36"
+	private JPopupMenu optionJPopupMenu = null;  //  @jve:decl-index=0:visual-constraint="596,259"
 	private JMenuItem duplicateJMenuItem = null;
 	private int lastRowClicked=0;
 	private JMenuItem removeJMenuItem = null;
-	private JDialog aboutJDialog = null;  //  @jve:decl-index=0:visual-constraint="581,166"
+	private JDialog aboutJDialog = null;  //  @jve:decl-index=0:visual-constraint="696,10"
 	private JPanel aboutJContentPane = null;
 	private JLabel aboutJLabel = null;
 	private JPanel infoJPanel = null;
@@ -45,34 +52,39 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	private JPanel spacerJPanel = null;
 	private JMenuItem refreshMenuItem = null;
 	private String[] headers=new String[] { "Numbers", "PB", "PP", "Draw Date", "Status" };
-	private JDialog duplicateCountjDialog = null;  //  @jve:decl-index=0:visual-constraint="339,186"
+	private JDialog duplicateCountjDialog = null;  //  @jve:decl-index=0:visual-constraint="698,214"
 	private JPanel duplicateCountjContentPane = null;
 	private JTextField duplicateCountjTextField = null;
 	private JLabel jLabel = null;
 	private JLabel jLabel2 = null;
 	protected boolean running=true;
+	private JDialog splashDialog = null;  //  @jve:decl-index=0:visual-constraint="11,250"
+	private JPanel splashContentPane = null;
+	private JLabel splashText = null;
+	private JPanel jPanel = null;
+	private JButton disagreeButton = null;
+	private JButton agreeButton = null;
+	private JPanel spacerPanel = null;
+	private boolean agree=false;
+	
 	public LotteryChecker() throws HeadlessException
 		{
 		super();
-		initialize();
 		}
 
 	public LotteryChecker(GraphicsConfiguration gc)
 		{
 		super(gc);
-		initialize();
 		}
 
 	public LotteryChecker(String title) throws HeadlessException
 		{
 		super(title);
-		initialize();
 		}
 
 	public LotteryChecker(String title, GraphicsConfiguration gc)
 		{
 		super(title, gc);
-		initialize();
 		}
 
 	/**
@@ -80,11 +92,11 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	 * 
 	 * @return void
 	 */
-	private void initialize()
+	public void initialize()
 		{
 		try
 			{
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			PowerBalls.getInstance(); //initialize the news and jackpot
 			}
 		catch (Exception e)
@@ -259,14 +271,31 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 				{
 					public void actionPerformed(ActionEvent e)
 						{
-						Component source=((Component)e.getSource()).getParent();
 						JDialog about=getAboutJDialog();
-						about.setLocation(source.getX(), source.getY());
+						about.setLocation(centerX(getAboutJDialog()), centerY(getAboutJDialog()));
 						about.show();
 						}
+
 				});
 			}
 		return aboutMenuItem;
+		}
+	
+	
+	private int centerX(Component c)
+		{
+		int myX=getContentPane().getLocationOnScreen().x;
+		myX+=getWidth()/2;
+		myX-=c.getWidth()/2;
+		return myX;
+		}
+
+	private int centerY(Component c)
+		{
+		int myY=getContentPane().getLocationOnScreen().y;
+		myY+=getHeight()/2;
+		myY-=c.getHeight()/2;
+		return myY;
 		}
 
 	/**
@@ -903,12 +932,147 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		}
 
 	/**
+	 * This method initializes splashDialog	
+	 * 	
+	 * @return javax.swing.JDialog	
+	 */
+	private JDialog getSplashDialog()
+		{
+		if (splashDialog==null)
+			{
+			splashDialog=new JDialog();
+			splashDialog.setSize(new java.awt.Dimension(500,530));
+			splashDialog.setModal(true);
+			splashDialog.setContentPane(getSplashContentPane());
+			Dimension screen=Toolkit.getDefaultToolkit().getScreenSize();
+			splashDialog.setLocation(screen.width/2-splashDialog.getWidth()/2,
+									 screen.height/2-splashDialog.getHeight()/2);
+			}
+		return splashDialog;
+		}
+
+	/**
+	 * This method initializes splashContentPane	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getSplashContentPane()
+		{
+		if (splashContentPane==null)
+			{
+			splashText = new JLabel();
+			String msg=Common.getInstance().getPage(SPLASH_PAGE);
+			if (msg.toLowerCase().indexOf("error")>=0 || msg.toLowerCase().indexOf("exception")>=0)
+				msg=ALT_SPLASH_MSG;
+			splashText.setText(msg);
+			splashText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+			splashContentPane=new JPanel();
+			splashContentPane.setLayout(new BorderLayout());
+			splashContentPane.add(splashText, java.awt.BorderLayout.CENTER);
+			splashContentPane.add(getJPanel(), java.awt.BorderLayout.SOUTH);
+			}
+		return splashContentPane;
+		}
+
+	/**
+	 * This method initializes jPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getJPanel()
+		{
+		if (jPanel==null)
+			{
+			jPanel=new JPanel();
+			jPanel.add(getDisagreeButton(), null);
+			jPanel.add(getSpacerPanel(), null);
+			jPanel.add(getAgreeButton(), null);
+			}
+		return jPanel;
+		}
+
+	/**
+	 * This method initializes disagreeButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getDisagreeButton()
+		{
+		if (disagreeButton==null)
+			{
+			disagreeButton=new JButton();
+			disagreeButton.setText("I DO NOT AGREE");
+			disagreeButton.addActionListener(new ActionListener()
+					{
+					public void actionPerformed(ActionEvent e)
+						{
+						setAgree(false);
+						getSplashDialog().dispose();
+						}
+					});
+			}
+		return disagreeButton;
+		}
+
+	/**
+	 * This method initializes agreeButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getAgreeButton()
+		{
+		if (agreeButton==null)
+			{
+			agreeButton=new JButton();
+			agreeButton.setText("I AGREE");
+			agreeButton.addActionListener(new ActionListener()
+				{
+				public void actionPerformed(ActionEvent e)
+					{
+					setAgree(true);
+					getSplashDialog().dispose();
+					}
+				});
+			}
+		return agreeButton;
+		}
+
+	/**
+	 * This method initializes spacerPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getSpacerPanel()
+		{
+		if (spacerPanel==null)
+			{
+			spacerPanel=new JPanel();
+			spacerPanel.setPreferredSize(new java.awt.Dimension(100,10));
+			}
+		return spacerPanel;
+		}
+
+	/**
 	 * Launches this application
 	 */
 	public static void main(String[] args)
 		{
 		LotteryChecker application=new LotteryChecker();
-		application.show();
+		try
+			{
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			}
+		catch (Exception e)
+			{
+			e.printStackTrace();
+			}
+		application.getSplashDialog().show();
+		if (application.isAgree())
+			{
+			application.initialize();
+			application.show();
+			}
+		else System.exit(0);
 		}
 
 	public void updateJackpotAmount(int jackpotAmount)
@@ -922,6 +1086,22 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	public void updateNews(String news)
 		{
 		infoJLabel.setText("<html><b>"+news+"</b></html>");
+		}
+
+	/**
+	 * @return Returns the agree.
+	 */
+	public boolean isAgree()
+		{
+		return agree;
+		}
+
+	/**
+	 * @param agree The agree to set.
+	 */
+	public void setAgree(boolean agree)
+		{
+		this.agree=agree;
 		}
 
 	}  //  @jve:decl-index=0:visual-constraint="10,10"
