@@ -176,7 +176,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			{
 			jJMenuBar=new JMenuBar();
 			jJMenuBar.add(getFileMenu());
-			jJMenuBar.add(getEditMenu());
+//			jJMenuBar.add(getEditMenu());
 			jJMenuBar.add(getHelpMenu());
 			}
 		return jJMenuBar;
