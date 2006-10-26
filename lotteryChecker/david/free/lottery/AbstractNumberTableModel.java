@@ -24,7 +24,10 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 	*/
 	public Class getColumnClass(int column) 
 		{
-		return getValueAt(0, column).getClass();
+		Object content=getValueAt(0, column);
+		if (content!=null)
+			return content.getClass();
+		else return Object.class;
 		}
 
 	public Number setNumber(Number number, int row, boolean startNumber)
