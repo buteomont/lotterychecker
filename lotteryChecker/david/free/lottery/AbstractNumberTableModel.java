@@ -19,7 +19,7 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 	/*
 	* JTable uses this method to determine the default renderer/
 	* editor for each cell. If we didn't implement this method,
-	* then the last column would contain text ("true"/"false"),
+	* then the powerplay column would contain text ("true"/"false"),
 	* rather than a check box.
 	*/
 	public Class getColumnClass(int column) 
@@ -30,7 +30,7 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 		else if (column==Number.COLUMN_POWER_PLAY)
 			return Boolean.class;
 		else
-			return Object.class;
+			return String.class;
 		}
 
 	public Number setNumber(Number number, int row, boolean startNumber)

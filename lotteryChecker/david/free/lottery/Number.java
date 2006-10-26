@@ -41,6 +41,11 @@ public class Number extends Thread implements Serializable
 		this();
 		addStatusListener(listener);
 		
+		//sanctify the numbers
+		nums=nums.trim();
+		pb=pb.trim();
+		drawDate=drawDate.trim();
+		
 		//validate the powerball number
 		if (!isANumber(pb)) 
 			throw new Exception(pb+" is not a number.");
