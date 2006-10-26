@@ -27,7 +27,10 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 		Object content=getValueAt(0, column);
 		if (content!=null)
 			return content.getClass();
-		else return Object.class;
+		else if (column==Number.COLUMN_POWER_PLAY)
+			return Boolean.class;
+		else
+			return Object.class;
 		}
 
 	public Number setNumber(Number number, int row, boolean startNumber)
