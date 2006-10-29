@@ -67,6 +67,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	private JButton agreeButton = null;
 	private JPanel spacerPanel = null;
 	private boolean agree=false;
+	private JButton okButton = null;
 	
 	public LotteryChecker() throws HeadlessException
 		{
@@ -690,12 +691,16 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			for (int i=0;i<count;i++)
 				removeRow(first,mod); //all following rows move up one
 			getNumberListJTable().clearSelection();
+			synchronizeRows(mod);
+			repaint();
 			}
 		}
 
 	private void removeRow(int row, AbstractNumberTableModel model)
 		{
-		model.rows.remove(row);
+		Number oldRow=(Number)model.rows.remove(row);
+		oldRow.quit=true;
+		oldRow.interrupt();
 		for (;row<model.rows.size();row++)
 			{
 			model.setValueQuietlyAt(model.getValueAt(row+1, Number.COLUMN_WHITE_NUMBERS), row, Number.COLUMN_WHITE_NUMBERS);
@@ -901,6 +906,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			duplicateCountjContentPane.add(jLabel2, null);
 			duplicateCountjContentPane.add(getDuplicateCountjTextField(), null);
 			duplicateCountjContentPane.add(jLabel, null);
+			duplicateCountjContentPane.add(getOkButton(), null);
 			}
 		return duplicateCountjContentPane;
 		}
@@ -921,10 +927,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 				{
 				public void actionPerformed(ActionEvent e)
 					{
-					String count=((JTextField)e.getSource()).getText();
-					if (Common.getInstance().isANumber(count))
-						duplicateRow(Integer.parseInt(count));
-					getDuplicateCountjDialog().setVisible(false);
+					processDupRequest();
 					}
 				});
 			}
@@ -1061,6 +1064,28 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		}
 
 	/**
+	 * This method initializes okButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getOkButton()
+		{
+		if (okButton==null)
+			{
+			okButton=new JButton();
+			okButton.setText("OK");
+			okButton.addActionListener(new ActionListener()
+				{
+				public void actionPerformed(ActionEvent e)
+					{
+					processDupRequest();
+					}
+				});
+			}
+		return okButton;
+		}
+
+	/**
 	 * Launches this application
 	 */
 	public static void main(String[] args)
@@ -1110,6 +1135,14 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	public void setAgree(boolean agree)
 		{
 		this.agree=agree;
+		}
+
+	private void processDupRequest()
+		{
+		String count=getDuplicateCountjTextField().getText();
+		if (Common.getInstance().isANumber(count))
+			duplicateRow(Integer.parseInt(count));
+		getDuplicateCountjDialog().setVisible(false);
 		}
 
 	}  //  @jve:decl-index=0:visual-constraint="10,10"
