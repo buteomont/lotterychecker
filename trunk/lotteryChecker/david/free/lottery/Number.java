@@ -154,7 +154,7 @@ public class Number extends Thread implements Serializable
 					if (winner>0)
 						{
 						String winAmount=null;
-						if (winner==1000000) winAmount="GRAND PRIZE";
+						if (winner==15000000) winAmount="GRAND PRIZE";
 						else
 							{
 							winAmount="$"+NumberFormat.getInstance().format(winner);
@@ -256,7 +256,7 @@ public class Number extends Thread implements Serializable
 			{
 			String drawnNums=buildDrawnNumberString();
 			String drawnPB=draw.powerballNumber;
-			if (checkGrandPrize(drawnNums,drawnPB)) results= 1000000; //grand prize
+			if (checkGrandPrize(drawnNums,drawnPB)) results= 15000000; //grand prize
 			else if (check200KPrize(drawnNums)) results= 200000; 
 			else if (check10KPrize(drawnNums,drawnPB)) results= 10000; 
 			else if (check100Prize(drawnNums,drawnPB)) results= 100; 
