@@ -177,7 +177,8 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			{
 			jJMenuBar=new JMenuBar();
 			jJMenuBar.add(getFileMenu());
-//			jJMenuBar.add(getEditMenu());
+			if (false) //comment out without generating compiler warning
+				jJMenuBar.add(getEditMenu());
 			jJMenuBar.add(getHelpMenu());
 			}
 		return jJMenuBar;
@@ -433,10 +434,12 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 							}
 						if (e.getButton()==MouseEvent.BUTTON3)
 							{
-							lastRowClicked=getNumberListJTable().rowAtPoint(e.getPoint()); 
 							Point menuloc=e.getPoint();
-//							menuloc.translate(getX(), getY()+getContentPane().getY());
-							menuloc.translate(getLocationOnScreen().x,getLocationOnScreen().y);
+							NumberTable table=getNumberListJTable();
+							lastRowClicked=table.rowAtPoint(menuloc);
+							if (table.getSelectedRowCount()==0)
+								table.setRowSelectionInterval(lastRowClicked, lastRowClicked);
+							menuloc.translate(table.getLocationOnScreen().x,table.getLocationOnScreen().y);
 							getOptionJPopupMenu().setLocation(menuloc);
 							getOptionJPopupMenu().setVisible(true);
 							e.consume();
@@ -594,7 +597,27 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		{
 		if (optionJPopupMenu==null)
 			{
-			optionJPopupMenu=new JPopupMenu();
+			optionJPopupMenu=new JPopupMenu()
+				{
+				public void setVisible(boolean show)
+					{
+					if (show)
+						{
+						getDuplicateJMenuItem().setEnabled(true);
+						getRemoveJMenuItem().setEnabled(true);
+						if (getNumberListJTable().getSelectedRowCount()==0)
+							{
+							getDuplicateJMenuItem().setEnabled(false);
+							getRemoveJMenuItem().setEnabled(false);
+							}
+						else if (getNumberListJTable().getSelectedRowCount()>1)
+							{
+							getDuplicateJMenuItem().setEnabled(false);
+							}
+						}
+					super.setVisible(show);
+					}
+				};
 			optionJPopupMenu.add(getDuplicateJMenuItem());
 			optionJPopupMenu.add(getRemoveJMenuItem());
 			}
@@ -611,7 +634,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		if (duplicateJMenuItem==null)
 			{
 			duplicateJMenuItem=new JMenuItem();
-			duplicateJMenuItem.setText("Duplicate this row...");
+			duplicateJMenuItem.setText("Duplicate selected row...");
 			duplicateJMenuItem.addActionListener(new ActionListener()
 				{
 				public void actionPerformed(ActionEvent e)
@@ -629,7 +652,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	protected void duplicateRow(int count)
 		{
 		AbstractNumberTableModel mod=(AbstractNumberTableModel)getNumberListJTable().getModel();
-		Number orignum=(Number)mod.rows.get(lastRowClicked);
+		Number orignum=(Number)mod.rows.get(getNumberListJTable().getSelectedRow());
 		while (count-->0)
 			{
 			try
@@ -664,7 +687,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		if (removeJMenuItem==null)
 			{
 			removeJMenuItem=new JMenuItem();
-			removeJMenuItem.setText("Remove Selected Rows");
+			removeJMenuItem.setText("Remove selected rows");
 			removeJMenuItem.addActionListener(new ActionListener()
 					{
 					public void actionPerformed(ActionEvent e)

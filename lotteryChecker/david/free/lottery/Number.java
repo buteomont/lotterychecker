@@ -1,5 +1,6 @@
 package david.free.lottery;
 
+
 import java.awt.Toolkit;
 import java.io.Serializable;
 import java.text.NumberFormat;
@@ -150,7 +151,7 @@ public class Number extends Thread implements Serializable
 						drawnNums=buildDrawnNumberString()
 									+" ("+draw.powerballNumber
 									+")";
-
+System.out.println(getHTMLNumbers());
 					if (winner>0)
 						{
 						String winAmount=null;
@@ -354,9 +355,30 @@ public class Number extends Thread implements Serializable
 			buf.append(numbs[i]).append(" ");
 		return buf.toString().trim();
 		}
+
+	public String getHTMLNumbers()
+		{
+		StringBuffer buf=new StringBuffer("<html>");
+		int winnerPattern=getPattern(COLUMN_WHITE_NUMBERS);
+		for (int i=0;i<numbs.length;i++)
+			{
+			buf.append("<font color=");
+			buf.append((winnerPattern & 1<<i)>0?"RED":"BLACK");
+			buf.append(">");
+			buf.append(numbs[i]).append("</font> ");
+			}
+		return buf.toString().trim()+"</html>";
+		}
+	
 	public String getPowerballNumber()
 		{
 		return pb;
+		}
+	public String getHTMLPowerballNumber()
+		{
+		int winnerPattern=getPattern(COLUMN_POWERBALL_NUMBER);
+		String c=winnerPattern>0?"RED":"BLACK";
+		return "<html><font color="+c+">"+pb+"</font></html>";
 		}
 	public String toString()
 		{

@@ -30,7 +30,6 @@ public class LotteryCellRenderer extends DefaultTableCellRenderer
 			g.setColor((winnerPattern & 1<<tok.countTokens())>0?Color.RED:Color.BLACK);
 			((Graphics2D)g).drawString(num, x, 13);
 			x+=numWidth;
-//			winnerPattern=winnerPattern<<1;
 			}
 		}
 	public Component getTableCellRendererComponent(
