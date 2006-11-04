@@ -47,6 +47,7 @@ public class Number extends Thread implements Serializable
 		pb=pb.trim();
 		drawDate=drawDate.trim();
 		nums=deHTML(nums);
+		pb=deHTML(pb);
 		
 		//validate the powerball number
 		if (!isANumber(pb)) 
