@@ -46,6 +46,7 @@ public class Number extends Thread implements Serializable
 		nums=nums.trim();
 		pb=pb.trim();
 		drawDate=drawDate.trim();
+		nums=deHTML(nums);
 		
 		//validate the powerball number
 		if (!isANumber(pb)) 
@@ -88,6 +89,11 @@ public class Number extends Thread implements Serializable
 			throw new Exception("\""+drawDate+"\" is not a valid date.");
 		this.powerPlay=powerPlay;
 //		start();  //let this thread go
+		}
+	
+	private String deHTML(String nums)
+		{
+		return Common.getInstance().stripHtml(nums);
 		}
 	
 	/**
@@ -151,7 +157,6 @@ public class Number extends Thread implements Serializable
 						drawnNums=buildDrawnNumberString()
 									+" ("+draw.powerballNumber
 									+")";
-System.out.println(getHTMLNumbers());
 					if (winner>0)
 						{
 						String winAmount=null;
@@ -403,6 +408,11 @@ System.out.println(getHTMLNumbers());
 		return d;
 		}
 	
+	public void setStatusListener(NumberStatusListener listener)
+		{
+		getStatusListeners().clear();
+		getStatusListeners().add(listener);
+		}
 	public void addStatusListener(NumberStatusListener listener)
 		{
 		getStatusListeners().add(listener);
