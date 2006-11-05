@@ -366,10 +366,11 @@ public class Number extends Thread implements Serializable
 		{
 		StringBuffer buf=new StringBuffer("<html>");
 		int winnerPattern=getPattern(COLUMN_WHITE_NUMBERS);
+		int shift=numbs.length-1;
 		for (int i=0;i<numbs.length;i++)
 			{
 			buf.append("<font color=");
-			buf.append((winnerPattern & 1<<i)>0?"RED":"BLACK");
+			buf.append((winnerPattern & 1<<(shift-i))>0?"RED":"BLACK");
 			buf.append(">");
 			buf.append(numbs[i]).append("</font> ");
 			}
