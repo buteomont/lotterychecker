@@ -391,6 +391,10 @@ public class Number extends Thread implements Serializable
 		{
 		return getNumbers()+" ("+pb+") "+getDrawingDateString();
 		}
+	public String toDelimitedString()
+		{
+		return getNumbers()+";"+pb+";"+powerPlay+";"+getDrawingDateString()+"\n";
+		}
 	public Date getDrawingDate()
 		{
 		return drawingDate;
@@ -417,7 +421,8 @@ public class Number extends Thread implements Serializable
 		}
 	public void addStatusListener(NumberStatusListener listener)
 		{
-		getStatusListeners().add(listener);
+		if (listener!=null)
+			getStatusListeners().add(listener);
 		}
 	private void notifyListeners(String status, String message)
 		{
