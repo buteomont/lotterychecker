@@ -609,7 +609,7 @@ public class Common implements Serializable
 			String line=null;
 			while ((line=br.readLine())!=null)
 				{
-				sb.append(line);
+				sb.append(line).append("\n");
 				}
 			buf=sb.toString().getBytes();
 			}
@@ -619,6 +619,29 @@ public class Common implements Serializable
 			}
 
 		return buf;
+		}
+
+	/**
+	 * Writes a file.  100% Java compliant (no system calls)
+	 * 
+	 * @param String fileName
+	 * @param byte[] contents
+	 * @param boolean append
+	 */
+	public void writeFile(String fileName, byte[] contents, boolean append)
+		throws java.io.IOException
+		{
+		java.io.FileOutputStream out=null;
+
+		try 
+			{
+		  out = new java.io.FileOutputStream(fileName, append);
+		  out.write(contents);
+			}
+		finally 
+			{
+			out.close();
+			}
 		}
 
 	/**
@@ -701,4 +724,5 @@ public class Common implements Serializable
 		original=substitute(original, "&frasl;", "/");
 		return sanctify(original, true);
 		}
+
 	}

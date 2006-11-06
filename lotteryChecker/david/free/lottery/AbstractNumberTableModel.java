@@ -5,16 +5,26 @@ import java.util.*;
 
 import javax.swing.table.DefaultTableModel;
 
+import david.util.Common;
+
 public abstract class AbstractNumberTableModel extends DefaultTableModel
 	{
-	public final static String filename="lottery.ser";
+	public final static String filename="lottery.ini";
 	List	rows	=new Vector(); //this gets serialized to disk when saving
 	protected boolean	addingEmptyRow;
 
 	public AbstractNumberTableModel(Object[][] data, Object[] columnNames)
 		{
 		super(data, columnNames);
-		hydrateRows();
+		try
+			{
+			hydrateRows();
+			}
+		catch (Exception e)
+			{
+			// Ok if it failed - could be first time run
+			e.printStackTrace();
+			}
 		}
 	/*
 	* JTable uses this method to determine the default renderer/
@@ -51,45 +61,36 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 		else return null;
 		}
 
-	public void hydrateRows()
+	/**
+	 * Initialize the lottery table with data from a disk file.
+	 * @throws Exception
+	 */
+	public void hydrateRows() throws Exception
 		{
-		FileInputStream fis=null;
-		ObjectInputStream in=null;
-		try
+		rows.clear();
+		Common common=Common.getInstance();
+		String data=new String(common.readFile(filename));
+		for (StringTokenizer lines=new StringTokenizer(data,"\n");lines.hasMoreTokens();)
 			{
-			fis=new FileInputStream(filename);
-			in=new ObjectInputStream(fis);
-			rows=(Vector)in.readObject();
-			in.close();
-//			for (Iterator nums=rows.iterator();nums.hasNext();)
-//				{
-//				((Number)nums.next()).start();
-//				}
-			}
-		catch (IOException ex)
-			{
-//			ex.printStackTrace();
-			}
-		catch (ClassNotFoundException e)
-			{
-			e.printStackTrace();
+			StringTokenizer line=new StringTokenizer(lines.nextToken(),";");
+			rows.add(new Number(line.nextToken(),line.nextToken(),Boolean.valueOf(line.nextToken()),line.nextToken(),null));
 			}
 		}
-	
-	public void persistRows()
+
+	/**
+	 * Save the lottery table data to a disk file in text format.
+	 * @throws IOException
+	 */
+	public void persistRows() throws IOException
 		{
-		FileOutputStream fos=null;
-		ObjectOutputStream out=null;
-		try
+		boolean append=false;
+		Common common=Common.getInstance();
+		for (Iterator i=rows.iterator();i.hasNext();)
 			{
-			fos=new FileOutputStream(filename);
-			out=new ObjectOutputStream(fos);
-			out.writeObject(rows);
-			out.close();
-			}
-		catch (IOException ex)
-			{
-			ex.printStackTrace();
+			Number num=(Number)i.next();
+			byte[] data=num.toDelimitedString().getBytes();
+			common.writeFile(filename, data, append);
+			append=true;
 			}
 		}
 	

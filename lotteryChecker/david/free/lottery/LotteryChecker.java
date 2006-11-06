@@ -373,8 +373,16 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 
 	protected void save()
 		{
-		((AbstractNumberTableModel)getNumberListJTable().getModel()).persistRows();
-		setMessage("Lottery numbers saved.");
+		try
+			{
+			((AbstractNumberTableModel)getNumberListJTable().getModel()).persistRows();
+			setMessage("Lottery numbers saved.");
+			}
+		catch (IOException e)
+			{
+			e.printStackTrace();
+			setMessage("Error - "+e.getMessage());
+			}
 		}
 
 	/**
