@@ -80,8 +80,10 @@ public class Number extends Thread implements Serializable
 		else Arrays.sort(numbs);
 
 		//validate the drawing date
-		drawingDate=new Date(Common.getInstance().getDateObject(drawDate+" 22:00").getTime()); //something wierd about java.sql.Date
 		Calendar c=Calendar.getInstance();
+		StringTokenizer st=new StringTokenizer(drawDate, "/-. ", false);
+		if (st.countTokens()<3) drawDate+="-"+c.get(Calendar.YEAR);
+		drawingDate=new Date(Common.getInstance().getDateObject(drawDate+" 22:00").getTime()); //something wierd about java.sql.Date
 		c.setTime(getDrawingDate());
 		int dow=c.get(Calendar.DAY_OF_WEEK);
 		if (dow!=Calendar.WEDNESDAY && dow!=Calendar.SATURDAY)

@@ -10,7 +10,7 @@ import david.util.Common;
 public abstract class AbstractNumberTableModel extends DefaultTableModel
 	{
 	public final static String filename="lottery.ini";
-	List	rows	=new Vector(); //this gets serialized to disk when saving
+	List	rows	=new Vector(); //this has all of the Number objects
 	protected boolean	addingEmptyRow;
 
 	public AbstractNumberTableModel(Object[][] data, Object[] columnNames)

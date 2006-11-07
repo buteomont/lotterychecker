@@ -507,7 +507,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 				model.setValueQuietlyAt(num.getHTMLPowerballNumber(), row, Number.COLUMN_POWERBALL_NUMBER);
 				model.setValueQuietlyAt(num.getPowerPlay(), row, Number.COLUMN_POWER_PLAY);
 				model.setValueQuietlyAt(num.getDrawingDateString(), row, Number.COLUMN_DRAW_DATE);
-				num.addStatusListener(getNewNumberStatusListener(row));
+				num.setStatusListener(getNewNumberStatusListener(row));
 				if (!num.isAlive() && !num.quit) 
 					num.start();
 				row++;
@@ -518,6 +518,13 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			model.rows.remove(i.next());
 		}
 
+	private void sortNumbers()
+		{
+		AbstractNumberTableModel mod=(AbstractNumberTableModel)getNumberListJTable().getModel();
+		Collections.sort(mod.rows, new DrawDateComparator());
+		synchronizeRows(mod);
+		}
+	
 	protected void updateNumbers(int row)
 		{
 		AbstractNumberTableModel mod=(AbstractNumberTableModel)getNumberListJTable().getModel();
@@ -580,6 +587,8 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		mod.setValueQuietlyAt(newnum.getHTMLNumbers(), row, Number.COLUMN_WHITE_NUMBERS); 
 		mod.setValueQuietlyAt(newnum.getHTMLPowerballNumber(), row, Number.COLUMN_POWERBALL_NUMBER); 
 		mod.setValueQuietlyAt(newnum.getDrawingDateString(), row, Number.COLUMN_DRAW_DATE);
+		
+//		sortNumbers(); //put them in chronological order
 		}
 
 	private NumberStatusListener getNewNumberStatusListener(final int row)
