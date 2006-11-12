@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
+import david.util.BrowserControl;
 import david.util.Common;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -17,12 +18,18 @@ import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JButton;
+import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import javax.swing.SwingConstants;
+import java.lang.String;
 
 public class LotteryChecker extends JFrame implements LotteryListener, JackpotListener
 	{
 
 	protected static final String	aboutText	="<html><center><h3>Powerball Lottery Checker</h3><small>by </small><b>David E. Powell</b><br><i>david@depowell.com</i></center></html>";
 	private static final String	SPLASH_PAGE	="http://www.depowell.com/lotterySplashMsg.html";
+	private static final String paypal="https://www.paypal.com/us/cgi-bin/webscr?cmd=p/ema/index-outside";
 	private JPanel		jContentPane	=null;
 	private JMenuBar	jJMenuBar		=null;
 	private JMenu		fileMenu		=null;
@@ -37,7 +44,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	private JScrollPane numberListJScrollPane = null;
 	private NumberTable numberListJTable = null;
 	private JLabel messageJLabel = null;
-	private JPopupMenu optionJPopupMenu = null;  //  @jve:decl-index=0:visual-constraint="596,259"
+	private JPopupMenu optionJPopupMenu = null;  //  @jve:decl-index=0:visual-constraint="587,326"
 	private JMenuItem duplicateJMenuItem = null;
 	private int lastRowClicked=0;
 	private JMenuItem removeJMenuItem = null;
@@ -58,16 +65,20 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	private JLabel jLabel = null;
 	private JLabel jLabel2 = null;
 	protected boolean running=true;
-	private JDialog splashDialog = null;  //  @jve:decl-index=0:visual-constraint="11,250"
+	private JDialog splashDialog = null;  //  @jve:decl-index=0:visual-constraint="20,324"
 	private JPanel splashContentPane = null;
-	private JLabel splashText = null;
 	private JPanel jPanel = null;
 	private JButton disagreeButton = null;
 	private JButton agreeButton = null;
 	private JPanel spacerPanel = null;
 	private boolean agree=false;
 	private JButton okButton = null;
-	
+	private JPanel jPanel2 = null;
+	private JPanel jPanel3 = null;
+	private JButton donateButton = null;
+	private JLabel jLabel3 = null;
+	private JPanel jPanel1 = null;
+	private JLabel jLabel4 = null;
 	public LotteryChecker() throws HeadlessException
 		{
 		super();
@@ -107,7 +118,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			}
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setJMenuBar(getJJMenuBar());
-		this.setSize(682, 234);
+		this.setSize(682, 291);
 		this.setLocation(600, 400);
 		this.setContentPane(getJContentPane());
 		this.setTitle("Powerball Checker");
@@ -518,7 +529,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			model.rows.remove(i.next());
 		}
 
-	private void sortNumbers()
+	public void sortNumbers()
 		{
 		AbstractNumberTableModel mod=(AbstractNumberTableModel)getNumberListJTable().getModel();
 		Collections.sort(mod.rows, new DrawDateComparator());
@@ -1024,24 +1035,28 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		{
 		if (splashContentPane==null)
 			{
-			splashText = new JLabel();
-			String msg=Common.getInstance().getPage(SPLASH_PAGE);
-			if (msg.toLowerCase().indexOf("error")>=0 || msg.toLowerCase().indexOf("exception")>=0) 
-				try
-					{
-					msg=new String(Common.getInstance().readFile("lotterySplashMsg.html"));
-					}
-				catch (IOException e)
-					{
-					e.printStackTrace();
-					System.exit(-1);
-					}
-			splashText.setText(msg);
-			splashText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+			GridBagConstraints gridBagConstraints = new GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+			gridBagConstraints.weightx = 1.0D;
+			gridBagConstraints.weighty = 1.0D;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
+			gridBagConstraints.gridy = 0;
+			GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
+			gridBagConstraints2.gridx = 0;
+			gridBagConstraints2.ipadx = 0;
+			gridBagConstraints2.ipady = 0;
+			gridBagConstraints2.anchor = java.awt.GridBagConstraints.WEST;
+			gridBagConstraints2.gridy = 1;
+			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
+			gridBagConstraints1.gridx = 0;
+			gridBagConstraints1.ipadx = 184;
+			gridBagConstraints1.gridy = 2;
 			splashContentPane=new JPanel();
-			splashContentPane.setLayout(new BorderLayout());
-			splashContentPane.add(splashText, java.awt.BorderLayout.CENTER);
-			splashContentPane.add(getJPanel(), java.awt.BorderLayout.SOUTH);
+			splashContentPane.setLayout(new GridBagLayout());
+			splashContentPane.add(getJPanel(), gridBagConstraints1);
+			splashContentPane.add(getJPanel3(), gridBagConstraints2);
+			splashContentPane.add(getJPanel1(), gridBagConstraints);
 			}
 		return splashContentPane;
 		}
@@ -1055,10 +1070,15 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		{
 		if (jPanel==null)
 			{
+			jLabel3 = new JLabel();
+			jLabel3.setText("<html><center><h2>Good Luck!</h2></center></html>");
+			jLabel3.setPreferredSize(new java.awt.Dimension(100,100));
+			jLabel3.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+			jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 			jPanel=new JPanel();
-			jPanel.add(getDisagreeButton(), null);
-			jPanel.add(getSpacerPanel(), null);
-			jPanel.add(getAgreeButton(), null);
+			jPanel.setLayout(new BorderLayout());
+			jPanel.add(getJPanel2(), java.awt.BorderLayout.SOUTH);
+			jPanel.add(jLabel3, java.awt.BorderLayout.NORTH);
 			}
 		return jPanel;
 		}
@@ -1144,6 +1164,103 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 				});
 			}
 		return okButton;
+		}
+
+	/**
+	 * This method initializes jPanel2	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getJPanel2()
+		{
+		if (jPanel2==null)
+			{
+			FlowLayout flowLayout1 = new FlowLayout();
+			flowLayout1.setVgap(15);
+			jPanel2=new JPanel();
+			jPanel2.setLayout(flowLayout1);
+			jPanel2.add(getDisagreeButton(), null);
+			jPanel2.add(getSpacerPanel(), null);
+			jPanel2.add(getAgreeButton(), null);
+			}
+		return jPanel2;
+		}
+
+	/**
+	 * This method initializes jPanel3	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getJPanel3()
+		{
+		if (jPanel3==null)
+			{
+			FlowLayout flowLayout = new FlowLayout();
+			flowLayout.setAlignment(java.awt.FlowLayout.LEFT);
+			flowLayout.setHgap(50);
+			jPanel3=new JPanel();
+			jPanel3.setLayout(flowLayout);
+			jPanel3.add(getDonateButton(), null);
+			}
+		return jPanel3;
+		}
+
+	/**
+	 * This method initializes donateButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getDonateButton()
+		{
+		if (donateButton==null)
+			{
+			donateButton=new JButton();
+			donateButton.setText("Donate");
+			donateButton.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+			donateButton.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+			donateButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+			donateButton.addActionListener(new ActionListener()
+				{
+				public void actionPerformed(ActionEvent e)
+					{
+					BrowserControl.displayURL(paypal);
+					}
+				});
+			}
+		return donateButton;
+		}
+
+	/**
+	 * This method initializes jPanel1	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getJPanel1()
+		{
+		if (jPanel1==null)
+			{
+			jLabel4 = new JLabel();
+			jLabel4.setPreferredSize(new java.awt.Dimension(1550,312));
+			jLabel4.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+			String msg=Common.getInstance().getPage(SPLASH_PAGE);
+			if (msg.toLowerCase().indexOf("error")>=0 || msg.toLowerCase().indexOf("exception")>=0) 
+				try
+					{
+					msg=new String(Common.getInstance().readFile("lotterySplashMsg.html"));
+					}
+				catch (IOException e)
+					{
+					e.printStackTrace();
+					System.exit(-1);
+					}
+			jLabel4.setText(msg);
+			jLabel4.setHorizontalAlignment(SwingConstants.CENTER);
+			jPanel1=new JPanel();
+			jPanel1.setLayout(new BorderLayout());
+			jPanel1.setPreferredSize(new java.awt.Dimension(1560,322));
+			jPanel1.add(jLabel4, java.awt.BorderLayout.CENTER);
+			}
+		return jPanel1;
 		}
 
 	/**
