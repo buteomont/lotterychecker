@@ -10,8 +10,9 @@ import david.util.Common;
 public abstract class AbstractNumberTableModel extends DefaultTableModel
 	{
 	public final static String filename="lottery.ini";
-	List	rows	=new Vector(); //this has all of the Number objects
+	private List	rows	=new Vector(); //this has all of the Number objects
 	protected boolean	addingEmptyRow;
+	private Map options=new Hashtable();  //this has all other options
 
 	public AbstractNumberTableModel(Object[][] data, Object[] columnNames)
 		{
@@ -19,6 +20,7 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 		try
 			{
 			hydrateRows();
+			hydrateOptions();
 			}
 		catch (Exception e)
 			{
@@ -72,8 +74,31 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 		String data=new String(common.readFile(filename));
 		for (StringTokenizer lines=new StringTokenizer(data,"\n");lines.hasMoreTokens();)
 			{
-			StringTokenizer line=new StringTokenizer(lines.nextToken(),";");
-			rows.add(new Number(line.nextToken(),line.nextToken(),Boolean.valueOf(line.nextToken()),line.nextToken(),null));
+			String candidate=lines.nextToken();
+			if (candidate.indexOf("=")<0) //anything with an "=" is not a ticket row
+				{
+				StringTokenizer line=new StringTokenizer(candidate,";");
+				rows.add(new Number(line.nextToken(),line.nextToken(),Boolean.valueOf(line.nextToken()),line.nextToken(),null));
+				}
+			}
+		}
+
+	/**
+	 * Initialize the lottery table with data from a disk file.
+	 * @throws Exception
+	 */
+	public void hydrateOptions() throws Exception
+		{
+		Common common=Common.getInstance();
+		String data=new String(common.readFile(filename));
+		for (StringTokenizer lines=new StringTokenizer(data,"\n");lines.hasMoreTokens();)
+			{
+			String line=lines.nextToken();
+			int equals=line.indexOf("=");
+			if (equals>0)
+				{
+				options.put(line.substring(0,equals),line.substring(equals+1));
+				}
 			}
 		}
 
@@ -81,14 +106,29 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 	 * Save the lottery table data to a disk file in text format.
 	 * @throws IOException
 	 */
-	public void persistRows() throws IOException
+	public void persistRows(boolean append) throws IOException
 		{
-		boolean append=false;
 		Common common=Common.getInstance();
 		for (Iterator i=rows.iterator();i.hasNext();)
 			{
 			Number num=(Number)i.next();
 			byte[] data=num.toDelimitedString().getBytes();
+			common.writeFile(filename, data, append);
+			append=true;
+			}
+		}
+	
+	/**
+	 * Save the lottery table data to a disk file in text format.
+	 * @throws IOException
+	 */
+	public void persistOptions(boolean append) throws IOException
+		{
+		Common common=Common.getInstance();
+		for (Iterator i=getOptions().keySet().iterator();i.hasNext();)
+			{
+			String name=(String)i.next();
+			byte[] data=(name+"="+getOptions().get(name)+"\n").getBytes();
 			common.writeFile(filename, data, append);
 			append=true;
 			}
@@ -108,5 +148,12 @@ public abstract class AbstractNumberTableModel extends DefaultTableModel
 		{
 		return addingEmptyRow;
 		}
-
+	public Map getOptions()
+		{
+		return options;
+		}
+	public void setOptions(Map options)
+		{
+		this.options=options;
+		}
 	}

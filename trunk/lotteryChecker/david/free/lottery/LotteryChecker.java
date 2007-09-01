@@ -23,6 +23,9 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import javax.swing.SwingConstants;
 import java.lang.String;
+import javax.swing.JCheckBox;
+import java.awt.Dimension;
+import java.awt.Insets;
 
 public class LotteryChecker extends JFrame implements LotteryListener, JackpotListener
 	{
@@ -43,7 +46,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	private JMenuItem	saveMenuItem	=null;
 	private JScrollPane numberListJScrollPane = null;
 	private NumberTable numberListJTable = null;
-	private JLabel messageJLabel = null;
+	private JLabel messageJLabel 		=null;
 	private JPopupMenu optionJPopupMenu = null;  //  @jve:decl-index=0:visual-constraint="587,326"
 	private JMenuItem duplicateJMenuItem = null;
 	private int lastRowClicked=0;
@@ -79,6 +82,12 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	private JLabel jLabel3 = null;
 	private JPanel jPanel1 = null;
 	private JLabel jLabel4 = null;
+	private JCheckBox dontAskAgainCheckBox = null;
+	private boolean dontAskAgain=false;
+	private int windowWidth=682;
+	private int windowHeight=291;
+	private int windowXLoc=600;
+	private int windowYLoc=400;
 	public LotteryChecker() throws HeadlessException
 		{
 		super();
@@ -106,6 +115,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	 */
 	public void initialize()
 		{
+		messageJLabel = new JLabel();
 		try
 			{
 //			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -116,10 +126,11 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			e.printStackTrace();
 			messageJLabel.setText(e.getMessage());
 			}
+		initializeOptions();
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setJMenuBar(getJJMenuBar());
-		this.setSize(682, 291);
-		this.setLocation(600, 400);
+		this.setSize(getWindowWidth(), getWindowHeight());
+		this.setLocation(getWindowXLoc(), getWindowYLoc());
 		this.setContentPane(getJContentPane());
 		this.setTitle("Powerball Checker");
 		this.messageJLabel.setText("");
@@ -154,6 +165,43 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 				});
 		}
 
+	private void initializeOptions()
+		{
+		Map options=((AbstractNumberTableModel)getNumberListJTable().getModel()).getOptions();
+		for (Iterator opts=options.keySet().iterator();opts.hasNext();)
+			{
+			String name=(String)opts.next();
+			String value=(String)options.get(name);
+			if (name.equalsIgnoreCase("windowWidth")) 
+				{
+				setWindowWidth(Integer.parseInt(value));
+				this.setSize(getWindowWidth(), getWindowHeight());
+				}
+			if (name.equalsIgnoreCase("windowHeight")) 
+				{
+				setWindowHeight(Integer.parseInt(value));
+				this.setSize(getWindowWidth(), getWindowHeight());
+				}
+			if (name.equalsIgnoreCase("windowXLoc")) 
+				{
+				setWindowXLoc(Integer.parseInt(value));
+				this.setLocation(getWindowXLoc(), getWindowYLoc());
+				}
+			if (name.equalsIgnoreCase("windowYLoc")) 
+				{
+				setWindowYLoc(Integer.parseInt(value));
+				this.setLocation(getWindowXLoc(), getWindowYLoc());
+				}
+			if (name.equalsIgnoreCase("dontAskAgain")) 
+				{
+				setDontAskAgain(Boolean.valueOf(value).booleanValue());
+				setAgree(Boolean.valueOf(value).booleanValue()); //implies agreement
+				}
+
+			}
+		
+		}
+
 	/**
 	 * This method initializes jContentPane
 	 * 
@@ -163,7 +211,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		{
 		if (jContentPane==null)
 			{
-			messageJLabel = new JLabel();
+			messageJLabel = new JLabel();//here for benefit of visual editor
 			messageJLabel.setText("message area");
 			messageJLabel.setForeground(java.awt.Color.red);
 			messageJLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -386,7 +434,11 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		{
 		try
 			{
-			((AbstractNumberTableModel)getNumberListJTable().getModel()).persistRows();
+			AbstractNumberTableModel model=(AbstractNumberTableModel)getNumberListJTable().getModel();
+			model.persistRows(false);
+			Map opts=packOptions();
+			model.setOptions(opts);
+			model.persistOptions(true);
 			setMessage("Lottery numbers saved.");
 			}
 		catch (IOException e)
@@ -394,6 +446,18 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			e.printStackTrace();
 			setMessage("Error - "+e.getMessage());
 			}
+		}
+
+	private Map packOptions()
+		{
+		Map opts=new Hashtable();
+		opts.put("dontAskAgain", new Boolean(isDontAskAgain()));
+		opts.put("windowWidth", ((int)getSize().getWidth())+"");
+		opts.put("windowHeight", ((int)getSize().getHeight())+"");
+		opts.put("windowHeight", ((int)getSize().getHeight())+"");
+		opts.put("windowXLoc", ((int)getLocation().getX())+"");
+		opts.put("windowYLoc", ((int)getLocation().getY())+"");
+		return opts;
 		}
 
 	/**
@@ -494,7 +558,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 
 	public int getPattern(int row, int column)
 		{
-		List rows=((AbstractNumberTableModel)getNumberListJTable().getModel()).rows;
+		List rows=((AbstractNumberTableModel)getNumberListJTable().getModel()).getRows();
 		if (rows.size()>row)
 			{
 			Number number=(Number)rows.get(row);
@@ -508,7 +572,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		{
 		Vector baddies=new Vector();
 		int row=0;
-		for (Iterator i=model.rows.iterator(); i.hasNext();)
+		for (Iterator i=model.getRows().iterator(); i.hasNext();)
 			{
 			Object o=i.next();
 			if (o instanceof Number)
@@ -526,13 +590,13 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			else baddies.add(o);
 			}
 		for (Iterator i=baddies.iterator();i.hasNext();)
-			model.rows.remove(i.next());
+			model.getRows().remove(i.next());
 		}
 
 	public void sortNumbers()
 		{
 		AbstractNumberTableModel mod=(AbstractNumberTableModel)getNumberListJTable().getModel();
-		Collections.sort(mod.rows, new DrawDateComparator());
+		Collections.sort(mod.getRows(), new DrawDateComparator());
 		synchronizeRows(mod);
 		}
 	
@@ -585,7 +649,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			oldnum.interrupt(); 
 			}
 	
-		mod.setNumber(newnum,row,!mod.rows.contains(newnum)); //don't start it if it's a dupe
+		mod.setNumber(newnum,row,!mod.getRows().contains(newnum)); //don't start it if it's a dupe
 	
 		if (oldnum==null)
 			System.out.println("Number "+newnum+" added.");
@@ -699,7 +763,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	protected void duplicateRow(int count)
 		{
 		AbstractNumberTableModel mod=(AbstractNumberTableModel)getNumberListJTable().getModel();
-		Number orignum=(Number)mod.rows.get(getNumberListJTable().getSelectedRow());
+		Number orignum=(Number)mod.getRows().get(getNumberListJTable().getSelectedRow());
 		while (count-->0)
 			{
 			try
@@ -708,12 +772,12 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 										 orignum.getPowerballNumber(),
 										 orignum.getPowerPlay(),
 										 Number.getNextDrawingAfter(orignum.getDrawingDateString()),
-										 getNewNumberStatusListener(mod.rows.size()));
-				mod.rows.add(newnum);
+										 getNewNumberStatusListener(mod.getRows().size()));
+				mod.getRows().add(newnum);
 				getOptionJPopupMenu().setVisible(false);
 //				if (mod.rows.size()>=10)
 //					addEmptyRow();
-				orignum=(Number)mod.rows.get(mod.rows.size()-1);
+				orignum=(Number)mod.getRows().get(mod.getRows().size()-1);
 				}
 			catch (Exception e)
 				{
@@ -768,17 +832,17 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 
 	private void removeRow(int row, AbstractNumberTableModel model)
 		{
-		Number oldRow=(Number)model.rows.remove(row);
+		Number oldRow=(Number)model.getRows().remove(row);
 		oldRow.quit=true;
 		oldRow.interrupt();
-		for (;row<model.rows.size();row++)
+		for (;row<model.getRows().size();row++)
 			{
 			model.setValueQuietlyAt(model.getValueAt(row+1, Number.COLUMN_WHITE_NUMBERS), row, Number.COLUMN_WHITE_NUMBERS);
 			model.setValueQuietlyAt(model.getValueAt(row+1, Number.COLUMN_POWERBALL_NUMBER), row, Number.COLUMN_POWERBALL_NUMBER);
 			model.setValueQuietlyAt(model.getValueAt(row+1, Number.COLUMN_POWER_PLAY), row, Number.COLUMN_POWER_PLAY);
 			model.setValueQuietlyAt(model.getValueAt(row+1, Number.COLUMN_DRAW_DATE), row, Number.COLUMN_DRAW_DATE);
 			model.setValueQuietlyAt(model.getValueAt(row+1, Number.COLUMN_STATUS), row, Number.COLUMN_STATUS);
-			Number num=(Number)model.rows.get(row);
+			Number num=(Number)model.getRows().get(row);
 			num.setStatusListener(getNewNumberStatusListener(row));
 			}
 		model.setValueQuietlyAt("", row, Number.COLUMN_WHITE_NUMBERS);
@@ -933,7 +997,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 				e.printStackTrace();
 				throw new NumberException(row, e.getMessage());
 				}
-			mod.rows.set(row, newNum);
+			mod.getRows().set(row, newNum);
 //			newNum.start();  //start the new one
 			num.quit=true;
 			num.interrupt(); //kill the old number
@@ -1047,6 +1111,9 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			gridBagConstraints2.ipadx = 0;
 			gridBagConstraints2.ipady = 0;
 			gridBagConstraints2.anchor = java.awt.GridBagConstraints.WEST;
+			gridBagConstraints2.gridwidth = 2;
+			gridBagConstraints2.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints2.insets = new Insets(0, 40, 0, 20);
 			gridBagConstraints2.gridy = 1;
 			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
 			gridBagConstraints1.gridx = 0;
@@ -1195,12 +1262,11 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		{
 		if (jPanel3==null)
 			{
-			FlowLayout flowLayout = new FlowLayout();
-			flowLayout.setAlignment(java.awt.FlowLayout.LEFT);
-			flowLayout.setHgap(50);
+			BorderLayout borderLayout = new BorderLayout();
 			jPanel3=new JPanel();
-			jPanel3.setLayout(flowLayout);
-			jPanel3.add(getDonateButton(), null);
+			jPanel3.setLayout(borderLayout);
+			jPanel3.add(getDonateButton(), BorderLayout.WEST);
+			jPanel3.add(getDontAskAgainCheckBox(), BorderLayout.EAST);
 			}
 		return jPanel3;
 		}
@@ -1264,6 +1330,21 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		}
 
 	/**
+	 * This method initializes dontAskAgainCheckBox	
+	 * 	
+	 * @return javax.swing.JCheckBox	
+	 */
+	private JCheckBox getDontAskAgainCheckBox()
+		{
+		if (dontAskAgainCheckBox==null)
+			{
+			dontAskAgainCheckBox=new JCheckBox();
+			dontAskAgainCheckBox.setText("Don't ask me again");
+			}
+		return dontAskAgainCheckBox;
+		}
+
+	/**
 	 * Launches this application
 	 */
 	public static void main(String[] args)
@@ -1277,10 +1358,11 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			{
 			e.printStackTrace();
 			}
-		application.getSplashDialog().show();
+		application.initialize();
+		if (!application.isDontAskAgain())
+			application.getSplashDialog().show();
 		if (application.isAgree())
 			{
-			application.initialize();
 			application.show();
 			}
 		else System.exit(0);
@@ -1321,6 +1403,56 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 		if (Common.getInstance().isANumber(count))
 			duplicateRow(Integer.parseInt(count));
 		getDuplicateCountjDialog().setVisible(false);
+		}
+
+	public int getWindowHeight()
+		{
+		return windowHeight;
+		}
+
+	public void setWindowHeight(int windowHeight)
+		{
+		this.windowHeight=windowHeight;
+		}
+
+	public int getWindowWidth()
+		{
+		return windowWidth;
+		}
+
+	public void setWindowWidth(int windowWidth)
+		{
+		this.windowWidth=windowWidth;
+		}
+
+	public int getWindowXLoc()
+		{
+		return windowXLoc;
+		}
+
+	public void setWindowXLoc(int windowXLoc)
+		{
+		this.windowXLoc=windowXLoc;
+		}
+
+	public int getWindowYLoc()
+		{
+		return windowYLoc;
+		}
+
+	public void setWindowYLoc(int windowYLoc)
+		{
+		this.windowYLoc=windowYLoc;
+		}
+
+	public boolean isDontAskAgain()
+		{
+		return dontAskAgain;
+		}
+
+	public void setDontAskAgain(boolean dontAskAgain)
+		{
+		this.dontAskAgain=dontAskAgain;
 		}
 
 	}  //  @jve:decl-index=0:visual-constraint="10,10"
