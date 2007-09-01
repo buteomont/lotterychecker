@@ -27,7 +27,8 @@ import javax.swing.JCheckBox;
 import java.awt.Dimension;
 import java.awt.Insets;
 
-public class LotteryChecker extends JFrame implements LotteryListener, JackpotListener
+public class LotteryChecker extends JFrame 
+	implements LotteryListener, JackpotListener, ActionListener
 	{
 
 	protected static final String	aboutText	="<html><center><h3>Powerball Lottery Checker</h3><small>by </small><b>David E. Powell</b><br><i>david@depowell.com</i></center></html>";
@@ -1340,6 +1341,7 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 			{
 			dontAskAgainCheckBox=new JCheckBox();
 			dontAskAgainCheckBox.setText("Don't ask me again");
+			dontAskAgainCheckBox.addActionListener(this);
 			}
 		return dontAskAgainCheckBox;
 		}
@@ -1453,6 +1455,14 @@ public class LotteryChecker extends JFrame implements LotteryListener, JackpotLi
 	public void setDontAskAgain(boolean dontAskAgain)
 		{
 		this.dontAskAgain=dontAskAgain;
+		}
+
+	public void actionPerformed(ActionEvent e)
+		{
+		if (e.getSource()==getDontAskAgainCheckBox())
+			{
+			setDontAskAgain(getDontAskAgainCheckBox().isSelected());
+			}
 		}
 
 	}  //  @jve:decl-index=0:visual-constraint="10,10"
