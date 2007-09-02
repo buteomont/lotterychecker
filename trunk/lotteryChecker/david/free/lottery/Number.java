@@ -157,9 +157,9 @@ public class Number extends Thread implements Serializable
 					//have the numbers now
 					String drawnNums="";
 					if (draw!=null)
-						drawnNums=buildDrawnNumberString()
-									+" ("+draw.powerballNumber
-									+")";
+						drawnNums=buildDrawnNumberString()+" ("+draw.powerballNumber+")";
+					if (powerPlay.booleanValue()) 
+						drawnNums+=" (x"+draw.powerplayNumber+")";
 					if (winner>0)
 						{
 						String winAmount=null;

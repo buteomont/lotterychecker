@@ -9,8 +9,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
-import david.util.BrowserControl;
-import david.util.Common;
+import david.util.*;
+
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -33,7 +33,6 @@ public class LotteryChecker extends JFrame
 
 	protected static final String	aboutText	="<html><center><h3>Powerball Lottery Checker</h3><small>by </small><b>David E. Powell</b><br><i>david@depowell.com</i></center></html>";
 	private static final String	SPLASH_PAGE	="http://www.depowell.com/lotterySplashMsg.html";
-	private static final String paypal="https://www.paypal.com/us/cgi-bin/webscr?cmd=p/ema/index-outside";
 	private JPanel		jContentPane	=null;
 	private JMenuBar	jJMenuBar		=null;
 	private JMenu		fileMenu		=null;
@@ -79,7 +78,7 @@ public class LotteryChecker extends JFrame
 	private JButton okButton = null;
 	private JPanel jPanel2 = null;
 	private JPanel jPanel3 = null;
-	private JButton donateButton = null;
+	private DonateButton donateButton = null;
 	private JLabel jLabel3 = null;
 	private JPanel jPanel1 = null;
 	private JLabel jLabel4 = null;
@@ -1277,22 +1276,11 @@ public class LotteryChecker extends JFrame
 	 * 	
 	 * @return javax.swing.JButton	
 	 */
-	private JButton getDonateButton()
+	private DonateButton getDonateButton()
 		{
 		if (donateButton==null)
 			{
-			donateButton=new JButton();
-			donateButton.setText("Donate");
-			donateButton.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-			donateButton.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-			donateButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-			donateButton.addActionListener(new ActionListener()
-				{
-				public void actionPerformed(ActionEvent e)
-					{
-					BrowserControl.displayURL(paypal);
-					}
-				});
+			donateButton=new DonateButton();
 			}
 		return donateButton;
 		}
