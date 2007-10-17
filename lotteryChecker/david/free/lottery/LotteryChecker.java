@@ -583,6 +583,9 @@ public class LotteryChecker extends JFrame
 				model.setValueQuietlyAt(num.getPowerPlay(), row, Number.COLUMN_POWER_PLAY);
 				model.setValueQuietlyAt(num.getDrawingDateString(), row, Number.COLUMN_DRAW_DATE);
 				num.setStatusListener(getNewNumberStatusListener(row));
+				int rowHeight=18;
+				if (num.isWinner()) rowHeight=23;
+				getNumberListJTable().setRowHeight(row, rowHeight);
 				if (!num.isAlive() && !num.quit) 
 					num.start();
 				row++;
