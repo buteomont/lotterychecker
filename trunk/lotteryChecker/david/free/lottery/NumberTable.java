@@ -3,6 +3,9 @@ package david.free.lottery;
 import java.util.Vector;
 
 import javax.swing.JTable;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 public class NumberTable extends JTable
@@ -13,15 +16,13 @@ public class NumberTable extends JTable
 			{
 				public boolean isCellEditable(int row, int column)
 					{
-					return column!=Number.COLUMN_STATUS;
+					return true;
+//					return column!=Number.COLUMN_STATUS;
 					}
 
 				public void setValueAt(Object value, int row, int col)
 					{
-					if (row>super.getRowCount()-2) //always have at least one blank row
-						addEmptyRow();
-			        Vector rowVector = (Vector)dataVector.elementAt(row);
-			        rowVector.setElementAt(value, col);
+					setValueQuietlyAt(value, row, col);
 					fireTableCellUpdated(row, col);
 					}
 
@@ -47,6 +48,12 @@ public class NumberTable extends JTable
 					}
 				
 			});
+		TableColumn col = getColumnModel().getColumn(Number.COLUMN_STATUS);
+		StatusTableCellRenderer stcr=new StatusTableCellRenderer();
+
+		col.setCellRenderer(stcr);
+	    col.setCellEditor(stcr);
+	    
 		}
 
 	public TableModel getModel()

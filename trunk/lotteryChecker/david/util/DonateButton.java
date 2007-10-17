@@ -1,5 +1,6 @@
 package david.util;
 
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -12,7 +13,7 @@ public class DonateButton extends JButton
 	public DonateButton()
 		{
 		setText("Donate");
-		setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+		setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 		setVerticalAlignment(javax.swing.SwingConstants.TOP);
 		setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
 		addActionListener(new ActionListener()
@@ -22,5 +23,11 @@ public class DonateButton extends JButton
 				BrowserControl.displayURL(paypal);
 				}
 			});
+		}
+	public DonateButton(int width, int height)
+		{
+		this();
+		setSize(width, height);
+		setMargin(new Insets(0,4,0,4));
 		}
 	}

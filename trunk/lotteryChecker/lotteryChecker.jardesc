@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jardesc>
+    <jar path="C:/workspace/Lottery Checker/lotteryChecker.jar"/>
+    <options overwrite="true" compress="true" exportErrors="false" exportWarnings="true" saveDescription="true" descriptionLocation="/Lottery Checker/lotteryChecker.jardesc" useSourceFolders="false" buildIfNeeded="true" includeDirectoryEntries="false"/>
+    <manifest manifestVersion="1.0" usesManifest="true" reuseManifest="true" saveManifest="true" generateManifest="false" manifestLocation="/Lottery Checker/Manifest" mainClassHandleIdentifier="=Lottery Checker/&lt;david.free.lottery{LotteryChecker.java[LotteryChecker">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportOutputFolder="false" exportJavaFiles="true">
+        <javaElement handleIdentifier="=Lottery Checker/&lt;david.util"/>
+        <file path="/Lottery Checker/Manifest"/>
+        <file path="/Lottery Checker/lotteryChecker.jardesc"/>
+        <javaElement handleIdentifier="=Lottery Checker/&lt;david.free.lottery"/>
+        <javaElement handleIdentifier="=Lottery Checker/&lt;david"/>
+        <file path="/Lottery Checker/.project"/>
+        <file path="/Lottery Checker/.classpath"/>
+        <file path="/Lottery Checker/lotterySplashMsg.html"/>
+        <javaElement handleIdentifier="=Lottery Checker/&lt;david.free"/>
+        <file path="/Lottery Checker/scraps.jpage"/>
+        <folder path="/Lottery Checker/.settings"/>
+    </selectedElements>
+</jardesc>

@@ -18,6 +18,7 @@ public class Number extends Thread implements Serializable
 	private Date drawingDate;
 	private transient List statusListeners=new Vector();
 	private transient PowerBalls.Draw draw;
+	private boolean winner=false;
 	/**
 	 * Set this to true to cause this thread to exit at next pass.
 	 */
@@ -147,8 +148,8 @@ public class Number extends Thread implements Serializable
 				{
 				try
 					{
-					int winner=checkForWinner();
-					if (winner<0) //not drawn yet?
+					int wins=checkForWinner();
+					if (wins<0) //not drawn yet?
 						{
 						notifyListeners("Waiting for numbers to be posted","");
 						sleep(60000);
@@ -160,13 +161,14 @@ public class Number extends Thread implements Serializable
 						drawnNums=buildDrawnNumberString()+" ("+draw.powerballNumber+")";
 					if (powerPlay.booleanValue()) 
 						drawnNums+=" (x"+draw.powerplayNumber+")";
-					if (winner>0)
+					if (wins>0)
 						{
+						setWinner(true);
 						String winAmount=null;
-						if (winner==15000000) winAmount="GRAND PRIZE";
+						if (wins==15000000) winAmount="GRAND PRIZE";
 						else
 							{
-							winAmount="$"+NumberFormat.getInstance().format(winner);
+							winAmount="$"+NumberFormat.getInstance().format(wins);
 							}
 						notifyListeners("<html>"+"<b>Possible "+winAmount+" Winner!</b> Drawn numbers: "+drawnNums+"</html>","");
 						playSound(winAmount);
@@ -495,5 +497,13 @@ public class Number extends Thread implements Serializable
 	public boolean isPowerPlay()
 		{
 		return powerPlay.booleanValue();
+		}
+	public boolean isWinner()
+		{
+		return winner;
+		}
+	public void setWinner(boolean winner)
+		{
+		this.winner=winner;
 		}
 	}
