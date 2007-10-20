@@ -12,7 +12,7 @@ public class DonateButton extends JButton
 	private static final String paypal="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=david%40depowell%2ecom&item_name=Lottery%20Checker%20Donation";
 	public DonateButton()
 		{
-		setText("Donate");
+		setText("Make A Donation");
 		setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 		setVerticalAlignment(javax.swing.SwingConstants.TOP);
 		setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
