@@ -1,7 +1,6 @@
 package david.free.lottery;
 
-import java.awt.Component;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.util.EventObject;
 
 import javax.swing.*;
@@ -15,31 +14,70 @@ public class StatusTableCellRenderer extends JPanel implements TableCellRenderer
 	{
 	protected EventListenerList	listenerList	=new EventListenerList();
 	protected ChangeEvent		changeEvent		=new ChangeEvent(this);
-	protected DonateButton		donateButton	=new DonateButton(45, 15);
-	private   StatusTableCellRenderer panel		=null;
+	protected final static DonateButton		donateButton	=new DonateButton(45, 15);
+
+	public StatusTableCellRenderer()
+		{
+		super();
+		setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
+		}
+
+
+	public StatusTableCellRenderer(boolean isDoubleBuffered)
+		{
+		super(isDoubleBuffered);
+		setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
+		}
+
+
+	public StatusTableCellRenderer(LayoutManager layout, boolean isDoubleBuffered)
+		{
+		super(layout, isDoubleBuffered);
+		setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
+		}
+
+
+	public StatusTableCellRenderer(LayoutManager layout)
+		{
+		super(layout);
+		setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));		}
 
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int rowIndex,
 		int vColIndex)
 		{
-		if (value instanceof JPanel)
-			return (JPanel)value;
-		else
+		Number number=((Number)((AbstractNumberTableModel)table.getModel()).getNumber(rowIndex));
+		if (number==null)
+			return new JLabel();
+		else 
 			{
-			panel=new StatusTableCellRenderer();
-			panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
-			panel.add(new JLabel((String)value));
-			if (value!=null&&((String)value).indexOf("Winner")>0) 
-				panel.add(donateButton);
-			return panel;
+			removeAll();
+			add(new JLabel(number.getStatus()));
+			if (number.isWinner())
+				add(donateButton);
+			return this;
 			}
 		}
 
-	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column)
+
+	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int rowIndex, int column)
 		{
-		Component comp=null;
-		if (((String)value).indexOf("Winner")>0)
-			comp=panel;
-		return comp;
+		Number number=((Number)((AbstractNumberTableModel)table.getModel()).getNumber(rowIndex));
+		if (number!=null)
+			{
+			if (number.isWinner())
+				{
+				StatusTableCellRenderer instance=new StatusTableCellRenderer();
+				instance.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
+				instance.add(new JLabel(number.getStatus()));
+				if (number.isWinner())
+					instance.add(donateButton);
+				return instance;
+				}
+			else 
+				return null;
+			}
+		else 
+			return null;
 		}
 
 	public void addCellEditorListener(CellEditorListener listener)
@@ -54,17 +92,13 @@ public class StatusTableCellRenderer extends JPanel implements TableCellRenderer
 
 	public Object getCellEditorValue()
 		{
-		Object value=new String("Thanks for the donation!");
-		JPanel panel=new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
-		panel.add(new JLabel((String)value));
-		panel.add(donateButton);
-		return panel;
+		cancelCellEditing();
+		return this;
 		}
 
 	public boolean isCellEditable(EventObject anEvent)
 		{
-		return true;//anEvent.getSource() instanceof JButton;
+		return true;
 		}
 
 	public void removeCellEditorListener(CellEditorListener listener)
@@ -79,7 +113,8 @@ public class StatusTableCellRenderer extends JPanel implements TableCellRenderer
 
 	public boolean stopCellEditing()
 		{
-		fireEditingStopped();
+//		fireEditingStopped();
+		fireEditingCanceled();
 		return true;
 		}
 

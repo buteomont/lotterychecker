@@ -19,6 +19,8 @@ public class Number extends Thread implements Serializable
 	private transient List statusListeners=new Vector();
 	private transient PowerBalls.Draw draw;
 	private boolean winner=false;
+	private String status="";
+	
 	/**
 	 * Set this to true to cause this thread to exit at next pass.
 	 */
@@ -151,7 +153,8 @@ public class Number extends Thread implements Serializable
 					int wins=checkForWinner();
 					if (wins<0) //not drawn yet?
 						{
-						notifyListeners("Waiting for numbers to be posted","");
+						setStatus("Waiting for numbers to be posted");
+						notifyListeners("");
 						sleep(60000);
 						continue;  //wait a minute and try again
 						}
@@ -170,10 +173,15 @@ public class Number extends Thread implements Serializable
 							{
 							winAmount="$"+NumberFormat.getInstance().format(wins);
 							}
-						notifyListeners("<html>"+"<b>Possible "+winAmount+" Winner!</b> Drawn numbers: "+drawnNums+"</html>","");
+						setStatus("<html>"+"<b>Possible "+winAmount+" Winner!</b> Drawn numbers: "+drawnNums+"</html>");
+						notifyListeners("");
 						playSound(winAmount);
 						}
-					else notifyListeners("<html>"+"Sorry, you should have picked these numbers: "+drawnNums+"</html>","");
+					else 
+						{
+						setStatus("<html>"+"Sorry, you should have picked these numbers: "+drawnNums+"</html>");
+						notifyListeners("");
+						}
 					}
 				catch (InterruptedException e)
 					{
@@ -181,7 +189,8 @@ public class Number extends Thread implements Serializable
 					}
 				catch (Exception e)
 					{
-					notifyListeners("Error",e.getMessage());
+					setStatus("Error");
+					notifyListeners(e.getMessage());
 					e.printStackTrace();
 					}
 				break;
@@ -224,7 +233,8 @@ public class Number extends Thread implements Serializable
 		try
 			{
 			String td=Common.getInstance().timeDifference(now, getDrawingDate());
-			notifyListeners("Drawing in "+td,"");
+			setStatus("Drawing in "+td);
+			notifyListeners("");
 			sleep(lineUpMinute(now)*1000);
 //			if (td.indexOf("seconds")<0)
 //				sleep(60000); //one minute
@@ -261,7 +271,8 @@ public class Number extends Thread implements Serializable
 		{
 		//check the numbers
 		int results=-1;
-		notifyListeners("Checking...","");
+		setStatus("Checking...");
+		notifyListeners("");
 		draw=(PowerBalls.Draw)PowerBalls.getInstance().getDrawings().get(getDrawingDateString());
 		if (draw!=null)
 			{
@@ -428,10 +439,10 @@ public class Number extends Thread implements Serializable
 		if (listener!=null)
 			getStatusListeners().add(listener);
 		}
-	private void notifyListeners(String status, String message)
+	private void notifyListeners(String message)
 		{
 		for (Iterator listeners=getStatusListeners().iterator();listeners.hasNext();)
-		((NumberStatusListener)listeners.next()).notify(this, status, message);	
+		((NumberStatusListener)listeners.next()).notify(this, getStatus(), message);	
 		}
 	public List getStatusListeners()
 		{
@@ -505,5 +516,13 @@ public class Number extends Thread implements Serializable
 	public void setWinner(boolean winner)
 		{
 		this.winner=winner;
+		}
+	public String getStatus()
+		{
+		return status;
+		}
+	public void setStatus(String status)
+		{
+		this.status=status;
 		}
 	}

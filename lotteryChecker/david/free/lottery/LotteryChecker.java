@@ -40,7 +40,7 @@ public class LotteryChecker extends JFrame
 	private JMenu		helpMenu		=null;
 	private JMenuItem	exitMenuItem	=null;
 	private JMenuItem	aboutMenuItem	=null;
-	private JMenuItem	cutMenuItem		=null;
+	private JMenuItem	duplicateMenuItem		=null;
 	private JMenuItem	copyMenuItem	=null;
 	private JMenuItem	pasteMenuItem	=null;
 	private JMenuItem	saveMenuItem	=null;
@@ -235,8 +235,7 @@ public class LotteryChecker extends JFrame
 			{
 			jJMenuBar=new JMenuBar();
 			jJMenuBar.add(getFileMenu());
-			if (false) //comment out without generating compiler warning
-				jJMenuBar.add(getEditMenu());
+			jJMenuBar.add(getEditMenu());
 			jJMenuBar.add(getHelpMenu());
 			}
 		return jJMenuBar;
@@ -271,9 +270,9 @@ public class LotteryChecker extends JFrame
 			{
 			editMenu=new JMenu();
 			editMenu.setText("Edit");
-			editMenu.add(getCutMenuItem());
-			editMenu.add(getCopyMenuItem());
-			editMenu.add(getPasteMenuItem());
+			editMenu.add(getDuplicateMenuItem());
+//			editMenu.add(getCopyMenuItem());
+//			editMenu.add(getPasteMenuItem());
 			}
 		return editMenu;
 		}
@@ -364,15 +363,24 @@ public class LotteryChecker extends JFrame
 	 * 	
 	 * @return javax.swing.JMenuItem	
 	 */
-	private JMenuItem getCutMenuItem()
+	private JMenuItem getDuplicateMenuItem()
 		{
-		if (cutMenuItem==null)
+		if (duplicateMenuItem==null)
 			{
-			cutMenuItem=new JMenuItem();
-			cutMenuItem.setText("Cut");
-			cutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK, true));
+			duplicateMenuItem=new JMenuItem();
+			duplicateMenuItem.setText("Duplicate selected row...");
+			duplicateMenuItem.setEnabled(false);
+			duplicateMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Event.CTRL_MASK, true));
+			duplicateMenuItem.addActionListener(new java.awt.event.ActionListener()
+				{
+				public void actionPerformed(java.awt.event.ActionEvent e)
+					{
+					showDupDialog();
+					}
+				});
+			
 			}
-		return cutMenuItem;
+		return duplicateMenuItem;
 		}
 
 	/**
@@ -520,6 +528,18 @@ public class LotteryChecker extends JFrame
 			((DefaultTableCellRenderer)numberListJTable.getTableHeader().getDefaultRenderer())
 				.setHorizontalAlignment(SwingConstants.CENTER);
 			numberListJTable.setToolTipText("Enter your 5 numbers here (separated by spaces), your powerball number, and the draw date.");
+			numberListJTable.addMouseListener(new java.awt.event.MouseListener()
+				{
+				public void mouseClicked(java.awt.event.MouseEvent e)
+					{
+					System.out.println("Mouse Clicked");
+					getDuplicateMenuItem().setEnabled(numberListJTable.getSelectedRow()>=0);
+					}
+				public void mousePressed(java.awt.event.MouseEvent e){}
+				public void mouseReleased(java.awt.event.MouseEvent e){}
+				public void mouseEntered(java.awt.event.MouseEvent e){}
+				public void mouseExited(java.awt.event.MouseEvent e){}
+				});
 			numberListJTable.addMouseListener(new MouseAdapter()
 				{
 					public void mouseClicked(MouseEvent e)
@@ -531,16 +551,11 @@ public class LotteryChecker extends JFrame
 						if (e.getButton()==MouseEvent.BUTTON3)
 							{
 							Point menuloc=e.getPoint();
-							NumberTable table=getNumberListJTable();
-							lastRowClicked=table.rowAtPoint(menuloc);
-							if (table.getSelectedRowCount()==0)
-								table.setRowSelectionInterval(lastRowClicked, lastRowClicked);
-							menuloc.translate(table.getLocationOnScreen().x,table.getLocationOnScreen().y);
-							getOptionJPopupMenu().setLocation(menuloc);
-							getOptionJPopupMenu().setVisible(true);
+							showDuplicateMenu(menuloc);
 							e.consume();
 							}
 						}
+
 				});
 			numberListJTable.getModel().addTableModelListener(new TableModelListener()
 					{
@@ -554,6 +569,21 @@ public class LotteryChecker extends JFrame
 			synchronizeRows((AbstractNumberTableModel)numberListJTable.getModel());
 			}
 		return numberListJTable;
+		}
+
+	/**
+	 * Pop up a menu to allow duplication of the selected row.
+	 * @param menuloc
+	 */
+	private void showDuplicateMenu(Point menuloc)
+		{
+		NumberTable table=getNumberListJTable();
+		lastRowClicked=table.rowAtPoint(menuloc);
+		if (table.getSelectedRowCount()==0)
+			table.setRowSelectionInterval(lastRowClicked, lastRowClicked);
+		menuloc.translate(table.getLocationOnScreen().x,table.getLocationOnScreen().y);
+		getOptionJPopupMenu().setLocation(menuloc);
+		getOptionJPopupMenu().setVisible(true);
 		}
 
 	public int getPattern(int row, int column)
@@ -753,14 +783,20 @@ public class LotteryChecker extends JFrame
 				{
 				public void actionPerformed(ActionEvent e)
 					{
-					int x=getLocationOnScreen().x+getWidth()/2-getDuplicateCountjDialog().getWidth()/2;
-					int y=getLocationOnScreen().y+getHeight()/2-getDuplicateCountjDialog().getHeight()/2;
-					getDuplicateCountjDialog().setLocation(x,y);
-					getDuplicateCountjDialog().setVisible(true);
+					showDupDialog();
 					}
+
 				});
 			}
 		return duplicateJMenuItem;
+		}
+
+	private void showDupDialog()
+		{
+		int x=getLocationOnScreen().x+getWidth()/2-getDuplicateCountjDialog().getWidth()/2;
+		int y=getLocationOnScreen().y+getHeight()/2-getDuplicateCountjDialog().getHeight()/2;
+		getDuplicateCountjDialog().setLocation(x,y);
+		getDuplicateCountjDialog().setVisible(true);
 		}
 
 	protected void duplicateRow(int count)
