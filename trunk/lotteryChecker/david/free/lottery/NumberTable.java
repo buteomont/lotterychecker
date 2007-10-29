@@ -41,10 +41,19 @@ public class NumberTable extends JTable
 
 				public void setValueQuietlyAt(Object value, int row, int col)
 					{
-					if (row>super.getRowCount()-2) //always have at least one blank row
-						addEmptyRow();
-			        Vector rowVector = (Vector)dataVector.elementAt(row);
-			        rowVector.setElementAt(value, col);
+					if (row>=0)
+						{
+						if (row>super.getRowCount()-2) //always have at least one blank row
+							addEmptyRow();
+				        Vector rowVector = (Vector)dataVector.elementAt(row);
+				        rowVector.setElementAt(value, col);
+	//			        if (col==Number.COLUMN_STATUS && value != null)
+	//			        	if (((String)value).indexOf("Winner")>=0)
+	//			        		{
+	//			        		StatusTableCellRenderer ce=new StatusTableCellRenderer();
+	//			        		setCellEditor(ce);
+	//			        		}
+						}
 					}
 				
 			});
