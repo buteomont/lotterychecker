@@ -40,20 +40,38 @@ public class StatusTableCellRenderer extends JPanel implements TableCellRenderer
 	public StatusTableCellRenderer(LayoutManager layout)
 		{
 		super(layout);
-		setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));		}
+		setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
+		}
 
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int rowIndex,
 		int vColIndex)
 		{
 		Number number=((Number)((AbstractNumberTableModel)table.getModel()).getNumber(rowIndex));
 		if (number==null)
-			return new JLabel();
+			{
+			JLabel lab=new JLabel();
+			if (isSelected)
+				lab.setBackground(table.getSelectionBackground());
+			else
+				lab.setBackground(table.getBackground());
+			return lab;
+			}
 		else 
 			{
 			removeAll();
 			add(new JLabel(number.getStatus()));
 			if (number.isWinner())
 				add(donateButton);
+			if (isSelected)
+				{
+				setBackground(table.getSelectionBackground());
+				setForeground(Color.WHITE);
+				}
+			else
+				{
+				setBackground(table.getBackground());
+				setForeground(Color.BLACK);
+				}
 			return this;
 			}
 		}
@@ -61,6 +79,7 @@ public class StatusTableCellRenderer extends JPanel implements TableCellRenderer
 
 	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int rowIndex, int column)
 		{
+		table.setRowSelectionInterval(rowIndex, rowIndex);
 		Number number=((Number)((AbstractNumberTableModel)table.getModel()).getNumber(rowIndex));
 		if (number!=null)
 			{
@@ -71,6 +90,16 @@ public class StatusTableCellRenderer extends JPanel implements TableCellRenderer
 				instance.add(new JLabel(number.getStatus()));
 				if (number.isWinner())
 					instance.add(donateButton);
+				if (isSelected)
+					{
+					instance.setBackground(table.getSelectionBackground());
+					setForeground(Color.WHITE);
+					}
+				else
+					{
+					instance.setBackground(table.getBackground());
+					setForeground(Color.BLACK);
+					}
 				return instance;
 				}
 			else 
