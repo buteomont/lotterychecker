@@ -528,34 +528,23 @@ public class LotteryChecker extends JFrame
 			((DefaultTableCellRenderer)numberListJTable.getTableHeader().getDefaultRenderer())
 				.setHorizontalAlignment(SwingConstants.CENTER);
 			numberListJTable.setToolTipText("Enter your 5 numbers here (separated by spaces), your powerball number, and the draw date.");
-			numberListJTable.addMouseListener(new java.awt.event.MouseListener()
-				{
-				public void mouseClicked(java.awt.event.MouseEvent e)
-					{
-					System.out.println("Mouse Clicked");
-					getDuplicateMenuItem().setEnabled(numberListJTable.getSelectedRow()>=0);
-					}
-				public void mousePressed(java.awt.event.MouseEvent e){}
-				public void mouseReleased(java.awt.event.MouseEvent e){}
-				public void mouseEntered(java.awt.event.MouseEvent e){}
-				public void mouseExited(java.awt.event.MouseEvent e){}
-				});
 			numberListJTable.addMouseListener(new MouseAdapter()
 				{
-					public void mouseClicked(MouseEvent e)
+				public void mouseClicked(MouseEvent e)
+					{
+					if (e.getButton()==MouseEvent.BUTTON1)
 						{
-						if (e.getButton()==MouseEvent.BUTTON1)
-							{
-							getOptionJPopupMenu().setVisible(false);
-							}
-						if (e.getButton()==MouseEvent.BUTTON3)
-							{
-							Point menuloc=e.getPoint();
-							showDuplicateMenu(menuloc);
-							e.consume();
-							}
+						System.out.println(e.paramString());
+						getDuplicateMenuItem().setEnabled(numberListJTable.getSelectedRow()>=0);
+						getOptionJPopupMenu().setVisible(false);
 						}
-
+					if (e.getButton()==MouseEvent.BUTTON3)
+						{
+						Point menuloc=e.getPoint();
+						showDuplicateMenu(menuloc);
+						e.consume();
+						}
+					}
 				});
 			numberListJTable.getModel().addTableModelListener(new TableModelListener()
 					{
