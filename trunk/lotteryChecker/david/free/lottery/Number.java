@@ -168,12 +168,15 @@ public class Number extends Thread implements Serializable
 						{
 						setWinner(true);
 						String winAmount=null;
-						if (wins==15000000) winAmount="GRAND PRIZE";
+						if (wins>=15000000) 
+							{
+							setStatus("<html><b><font color=red><blink>GRAND PRIZE WINNER!</blink></font></b></html>");
+							}
 						else
 							{
 							winAmount="$"+NumberFormat.getInstance().format(wins);
+							setStatus("<html><b><font color=red>"+winAmount+" Winner!</font></b> Drawn numbers: "+drawnNums+"</html>");
 							}
-						setStatus("<html>"+"<b>Possible "+winAmount+" Winner!</b> Drawn numbers: "+drawnNums+"</html>");
 						notifyListeners("");
 						playSound(winAmount);
 						}
