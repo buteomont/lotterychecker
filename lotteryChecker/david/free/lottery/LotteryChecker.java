@@ -1,6 +1,7 @@
 package david.free.lottery;
 
 import java.awt.*;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.lang.String;
 import javax.swing.JCheckBox;
 import java.awt.Dimension;
 import java.awt.Insets;
+import javax.swing.JMenuItem;
 
 public class LotteryChecker extends JFrame 
 	implements LotteryListener, JackpotListener, ActionListener
@@ -88,6 +90,7 @@ public class LotteryChecker extends JFrame
 	private int windowHeight=291;
 	private int windowXLoc=600;
 	private int windowYLoc=400;
+	private JMenuItem editOptionsMenuItem = null;
 	public LotteryChecker() throws HeadlessException
 		{
 		super();
@@ -128,6 +131,8 @@ public class LotteryChecker extends JFrame
 			}
 		initializeOptions();
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setSize(new Dimension(406, 216));
+		this.setPreferredSize(new Dimension(460, 195));
 		this.setJMenuBar(getJJMenuBar());
 		this.setSize(getWindowWidth(), getWindowHeight());
 		this.setLocation(getWindowXLoc(), getWindowYLoc());
@@ -272,6 +277,7 @@ public class LotteryChecker extends JFrame
 			editMenu.setText("Edit");
 			editMenu.add(getDuplicateMenuItem());
 //			editMenu.add(getCopyMenuItem());
+			editMenu.add(getEditOptionsMenuItem());
 //			editMenu.add(getPasteMenuItem());
 			}
 		return editMenu;
@@ -1360,6 +1366,56 @@ public class LotteryChecker extends JFrame
 			dontAskAgainCheckBox.addActionListener(this);
 			}
 		return dontAskAgainCheckBox;
+		}
+
+	/**
+	 * This method initializes optionsWindow	
+	 * 	
+	 * @return david.free.lottery.Options	
+	 */
+	private Options getOptionsWindow()
+		{
+		Options optionsWindow=new Options(this, ModalityType.APPLICATION_MODAL);
+		Point middle=new Point(getLocation());
+		middle.translate(getWidth()/2-optionsWindow.getWidth()/2,
+						 getHeight()/2-optionsWindow.getHeight()/2);
+		optionsWindow.setLocation(middle);
+		optionsWindow.setVisible(true);
+		return optionsWindow;
+		}
+
+	/**
+	 * This method initializes editOptionsMenuItem	
+	 * 	
+	 * @return javax.swing.JMenuItem	
+	 */
+	private JMenuItem getEditOptionsMenuItem()
+		{
+		if (editOptionsMenuItem==null)
+			{
+			editOptionsMenuItem=new JMenuItem();
+			editOptionsMenuItem.setText("Options...");
+			editOptionsMenuItem.addActionListener(new java.awt.event.ActionListener()
+				{
+					public void actionPerformed(java.awt.event.ActionEvent e)
+						{
+						Options options=getOptionsWindow();
+						if (options.getChoice()==Options.CHOICE_OK)
+							{
+							if (options.notifyByEmail())
+								{
+								String emailAddress=options.getEmailAddress();
+								System.out.println("Sending email to "+emailAddress);
+								}
+							if (options.notifyBySms())
+								{
+								System.out.println("Sending an SMS message to ");
+								}
+							}
+						}
+				});
+			}
+		return editOptionsMenuItem;
 		}
 
 	/**

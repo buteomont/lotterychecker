@@ -153,7 +153,7 @@ public class Number extends Thread implements Serializable
 					int wins=checkForWinner();
 					if (wins<0) //not drawn yet?
 						{
-						setStatus("Waiting for numbers to be posted");
+						setStatus("Waiting for numbers to be posted at "+PowerBalls.PB_URL);
 						notifyListeners("");
 						sleep(60000);
 						continue;  //wait a minute and try again
