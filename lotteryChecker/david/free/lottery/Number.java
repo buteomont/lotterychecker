@@ -13,8 +13,8 @@ public class Number extends Thread implements Serializable
 	private String[] numbs=new String[5];
 	private String pb;
 	private Boolean powerPlay=new Boolean(false);
-	private int maxWhite=55;
-	private int maxPB=42;
+	private int maxWhite=59;
+	private int maxPB=39;
 	private Date drawingDate;
 	private transient List statusListeners=new Vector();
 	private transient PowerBalls.Draw draw;
