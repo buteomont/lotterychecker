@@ -289,8 +289,13 @@ public class Number extends Thread implements Serializable
 			else if (check4Prize(drawnNums,drawnPB)) results= 4; 
 			else if (check3Prize(drawnPB)) results= 3;
 			else results=0;
-			if (powerPlay.booleanValue())
-				results*=Integer.parseInt((draw.powerplayNumber));
+			if (powerPlay.booleanValue() 					//has powerplay
+					&& !checkGrandPrize(drawnNums,drawnPB)	//and not grand prize
+					&& !check200KPrize(drawnNums))			//and not 200K prize
+				results*=Integer.parseInt((draw.powerplayNumber));//then multiply by powerplay
+			else if (powerPlay.booleanValue()			//has powerplay
+					&& check200KPrize(drawnNums))		//and 200K prize
+				results*=5;								//special case, always $1M
 			}
 		return results;
 		}
