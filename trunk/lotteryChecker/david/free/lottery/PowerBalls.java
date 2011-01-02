@@ -14,7 +14,8 @@ import david.util.Common;
 public class PowerBalls
 	{
 	public static final String PB_URL="http://www.powerball.com/powerball/winnums-text.txt";
-	public static final String PB_MAIN_PAGE_URL="http://www.powerball.com/";
+//	public static final String PB_MAIN_PAGE_URL="http://www.powerball.com/";
+	public static final String PB_MAIN_PAGE_URL="http://www.powerball.com/pb_home-old.asp";
 	public static String jackpotAmountStart="<strong>&nbsp;&nbsp;$";
 	public static String jackpotAmountEnd="Million</strong>";
 	public static String newsStart="var marqueecontent='<nobr>";

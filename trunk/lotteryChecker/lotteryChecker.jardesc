@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
-    <jar path="C:/workspace/Lottery Checker/lotteryChecker.jar"/>
+    <jar path="/home/david/workspaces/java/Lottery Checker/lotteryChecker.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/Lottery Checker/lotteryChecker.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
@@ -20,7 +20,7 @@
         <file path="/Lottery Checker/.classpath"/>
         <folder path="/Lottery Checker/.settings"/>
         <file path="/Lottery Checker/lotterySplashMsg.html"/>
-        <file path="/Lottery Checker/scraps.jpage"/>
         <file path="/Lottery Checker/Manifest"/>
+        <file path="/Lottery Checker/scraps.jpage"/>
     </selectedElements>
 </jardesc>
