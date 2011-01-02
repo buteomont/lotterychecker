@@ -15,6 +15,8 @@ public class PowerBalls
 	{
 	public static final String PB_URL="http://www.powerball.com/powerball/winnums-text.txt";
 //	public static final String PB_MAIN_PAGE_URL="http://www.powerball.com/";
+	//they changed the web page.  We need to update the program to use the new one.
+	//Just pointing to the old one for now.
 	public static final String PB_MAIN_PAGE_URL="http://www.powerball.com/pb_home-old.asp";
 	public static String jackpotAmountStart="<strong>&nbsp;&nbsp;$";
 	public static String jackpotAmountEnd="Million</strong>";
