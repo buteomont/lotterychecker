@@ -91,7 +91,7 @@ public class PowerBalls
 			if (lTok.hasMoreTokens()) draw.whiteNumbers[3]=lTok.nextToken(); else continue;
 			if (lTok.hasMoreTokens()) draw.whiteNumbers[4]=lTok.nextToken(); else continue;
 			if (lTok.hasMoreTokens()) draw.powerballNumber=lTok.nextToken(); else continue;
-			if (lTok.hasMoreTokens()) draw.powerplayNumber=lTok.nextToken(); else continue;
+			if (lTok.hasMoreTokens()) draw.powerplayNumber=lTok.nextToken(); //sometimes PowerPlay number is not posted for a while.
 			Arrays.sort(draw.whiteNumbers);
 			instance.getDrawings().put(draw.drawDate, draw);
 			}
