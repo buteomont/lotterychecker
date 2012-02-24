@@ -190,6 +190,12 @@ public class Number extends Thread implements Serializable
 					{
 					break; //someone wants to stop
 					}
+				catch (PowerballException e)
+					{
+					setStatus(e.getMessage());
+					notifyListeners(e.getMessage());
+					e.printStackTrace();
+					}
 				catch (Exception e)
 					{
 					setStatus("Error");
@@ -289,6 +295,8 @@ public class Number extends Thread implements Serializable
 			else if (check4Prize(drawnNums,drawnPB)) results= 4; 
 			else if (check3Prize(drawnPB)) results= 3;
 			else results=0;
+			if (powerPlay.booleanValue() && draw.powerplayNumber==null)
+				throw new PowerballException("Error - PowerPlay value not available - check numbers manually.");
 			if (powerPlay.booleanValue() 					//has powerplay
 					&& !checkGrandPrize(drawnNums,drawnPB)	//and not grand prize
 					&& !check200KPrize(drawnNums))			//and not 200K prize
